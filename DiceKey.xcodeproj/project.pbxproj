@@ -14,9 +14,9 @@
 		D01A46562210651300ECE267 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D01A46552210651300ECE267 /* Assets.xcassets */; };
 		D01A46592210651300ECE267 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D01A46572210651300ECE267 /* LaunchScreen.storyboard */; };
 		D01A46632210675C00ECE267 /* ObjectiveCHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = D01A46612210675B00ECE267 /* ObjectiveCHeader.m */; };
-		D01A46652210681200ECE267 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01A46642210681200ECE267 /* ViewController.swift */; };
 		D01A466922106FC900ECE267 /* BigInt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D01A466822106FC900ECE267 /* BigInt.framework */; };
 		D01A466B22106FCF00ECE267 /* SipHash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D01A466A22106FCF00ECE267 /* SipHash.framework */; };
+		D094D0712211AB760042611E /* DiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D094D0702211AB760042611E /* DiceViewController.swift */; };
 		D0C9FA6122110FFC00C91BF4 /* diceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C9FA6022110FFC00C91BF4 /* diceCreator.swift */; };
 		D0C9FA68221112F200C91BF4 /* dice3.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C9FA63221112F100C91BF4 /* dice3.png */; };
 		D0C9FA69221112F200C91BF4 /* dice5.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C9FA64221112F100C91BF4 /* dice5.png */; };
@@ -40,9 +40,9 @@
 		D01A465A2210651300ECE267 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D01A46602210675A00ECE267 /* DiceKey-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DiceKey-Bridging-Header.h"; sourceTree = "<group>"; };
 		D01A46612210675B00ECE267 /* ObjectiveCHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectiveCHeader.m; sourceTree = "<group>"; };
-		D01A46642210681200ECE267 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewController.swift; path = "../../BitKeys/BitKeys/View Controllers/Home/ViewController.swift"; sourceTree = "<group>"; };
 		D01A466822106FC900ECE267 /* BigInt.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BigInt.framework; path = Carthage/Build/iOS/BigInt.framework; sourceTree = "<group>"; };
 		D01A466A22106FCF00ECE267 /* SipHash.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SipHash.framework; path = Carthage/Build/iOS/SipHash.framework; sourceTree = "<group>"; };
+		D094D0702211AB760042611E /* DiceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiceViewController.swift; sourceTree = "<group>"; };
 		D0C9FA6022110FFC00C91BF4 /* diceCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = diceCreator.swift; sourceTree = "<group>"; };
 		D0C9FA63221112F100C91BF4 /* dice3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dice3.png; sourceTree = "<group>"; };
 		D0C9FA64221112F100C91BF4 /* dice5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dice5.png; sourceTree = "<group>"; };
@@ -106,7 +106,7 @@
 				D01A464F2210650C00ECE267 /* Main.storyboard */,
 				D01A46552210651300ECE267 /* Assets.xcassets */,
 				D01A46572210651300ECE267 /* LaunchScreen.storyboard */,
-				D01A46642210681200ECE267 /* ViewController.swift */,
+				D094D0702211AB760042611E /* DiceViewController.swift */,
 				D01A465A2210651300ECE267 /* Info.plist */,
 				D01A46522210650C00ECE267 /* DiceKey.xcdatamodeld */,
 				D01A46612210675B00ECE267 /* ObjectiveCHeader.m */,
@@ -262,7 +262,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D0C9FA6122110FFC00C91BF4 /* diceCreator.swift in Sources */,
-				D01A46652210681200ECE267 /* ViewController.swift in Sources */,
+				D094D0712211AB760042611E /* DiceViewController.swift in Sources */,
 				D01A46632210675C00ECE267 /* ObjectiveCHeader.m in Sources */,
 				D01A46542210650C00ECE267 /* DiceKey.xcdatamodeld in Sources */,
 				D01A464C2210650C00ECE267 /* AppDelegate.swift in Sources */,
