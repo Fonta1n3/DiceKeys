@@ -1,0 +1,9 @@
+{
+  "commitish" : "v1.2.2",
+  "iOS" : [
+    {
+      "name" : "SipHash",
+      "hash" : "fbfb08ce137d25687b28f12149783edfda37e893f2fa2d1ccda94c876ef88a6c"
+    }
+  ]
+}

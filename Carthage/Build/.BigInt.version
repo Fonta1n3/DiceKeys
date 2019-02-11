@@ -1,0 +1,9 @@
+{
+  "commitish" : "v3.1.0",
+  "iOS" : [
+    {
+      "name" : "BigInt",
+      "hash" : "ea3e0359ae879eb3eb62f0df7e3b3f3e21b0ffac528f18b2bf05ad7071ae5059"
+    }
+  ]
+}
