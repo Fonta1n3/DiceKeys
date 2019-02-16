@@ -39,6 +39,7 @@ class DiceViewController: UIViewController {
     var joinedBits = String()
     var bitCount:Int! = 0
     var clearButton = UIButton()
+    let getNowButton = UIButton()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,6 +52,66 @@ class DiceViewController: UIViewController {
         addShadow(view: percentageLabel)
         percentageLabel.font = UIFont.init(name: "HelveticaNeue-Bold", size: 30)
         percentageLabel.textAlignment = .center
+        
+    }
+    
+    func addGetNowButton() {
+        
+        DispatchQueue.main.async {
+            self.getNowButton.removeFromSuperview()
+            self.getNowButton.frame = CGRect(x: 5, y: 20, width: 90, height: 55)
+            self.getNowButton.showsTouchWhenHighlighted = true
+            self.getNowButton.setTitle("Get Now", for: .normal)
+            self.getNowButton.titleLabel?.font = UIFont.init(name: "HelveticaNeue-Bold", size: 20)
+            self.getNowButton.backgroundColor = UIColor.clear
+            self.getNowButton.setTitleColor(UIColor.white, for: .normal)
+            self.getNowButton.addTarget(self, action: #selector(self.getKeysNow), for: .touchUpInside)
+            self.view.addSubview(self.getNowButton)
+        }
+        
+   }
+    
+    @objc func getKeysNow() {
+        
+        //insert alert
+        DispatchQueue.main.async {
+            
+            let alert = UIAlertController(title: "Attention!", message: "By tapping this button we will use any dice rolls you have made in conjunction with Apples cryptographically secure random number generator to create your recovery phrase", preferredStyle: UIAlertController.Style.actionSheet)
+            
+            alert.addAction(UIAlertAction(title: NSLocalizedString("Ok", comment: ""), style: .default, handler: { (action) in
+                
+                self.percentageLabel.removeFromSuperview()
+                self.clearButton.removeFromSuperview()
+                
+                for dice in self.diceArray {
+                    dice.removeFromSuperview()
+                }
+                self.diceArray.removeAll()
+                self.tappedIndex = 0
+                
+                self.seedDict  = createPrivateKey(viewController: self, password: self.password, diceRolls: self.joinedBits).0
+                let success = createPrivateKey(viewController: self, password: self.password, diceRolls: self.joinedBits).1
+                
+                if success {
+                    
+                    self.words = self.seedDict["seed"] as! String
+                    self.button.removeFromSuperview()
+                    self.showRecoveryPhraseAndQRCode()
+                    
+                } else {
+                    
+                    self.displayAlert(viewController: self, title: "Error", message: "We apologize, that really shouldn't have happened... Please email us at BitSenseApp@gmail.com and let us know what happened so we can fix it.")
+                }
+                
+            }))
+            
+            alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: { (action) in }))
+            
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true) {
+                print("option menu presented")
+            }
+        }
         
     }
     
@@ -178,16 +239,18 @@ class DiceViewController: UIViewController {
     func showRecoveryPhraseAndQRCode() {
         print("showPrivateKeyAndAddressQRCodes")
         
-        self.button.removeFromSuperview()
-        self.button = UIButton(frame: CGRect(x: 5, y: self.view.frame.maxY - 60, width: 90, height: 55))
-        self.button.showsTouchWhenHighlighted = true
-        self.button.setTitle("Done", for: .normal)
-        self.button.titleLabel?.font = UIFont.init(name: "HelveticaNeue-Bold", size: 20)
-        self.button.backgroundColor = UIColor.clear
-        addShadow(view: self.button)
-        self.button.setTitleColor(UIColor.white, for: .normal)
-        self.button.addTarget(self, action: #selector(self.home), for: .touchUpInside)
-        self.view.addSubview(self.button)
+        getNowButton.removeFromSuperview()
+        
+        button.removeFromSuperview()
+        button = UIButton(frame: CGRect(x: 5, y: view.frame.maxY - 60, width: 90, height: 55))
+        button.showsTouchWhenHighlighted = true
+        button.setTitle("Done", for: .normal)
+        button.titleLabel?.font = UIFont.init(name: "HelveticaNeue-Bold", size: 20)
+        button.backgroundColor = UIColor.clear
+        addShadow(view: button)
+        button.setTitleColor(UIColor.white, for: .normal)
+        button.addTarget(self, action: #selector(home), for: .touchUpInside)
+        view.addSubview(button)
         
         self.mnemonicLabel.frame = CGRect(x: 5, y: 25, width: self.view.frame.width - 10, height: 60)
         self.mnemonicLabel.text = "Your recovery phrase/seed:"
@@ -376,7 +439,7 @@ class DiceViewController: UIViewController {
         
         DispatchQueue.main.async {
             self.clearButton.removeFromSuperview()
-            self.clearButton = UIButton(frame: CGRect(x: self.view.frame.maxX - 60, y: 20, width: 55 , height: 55))
+            self.clearButton.frame = CGRect(x: self.view.frame.maxX - 60, y: 20, width: 55 , height: 55)
             self.clearButton.setImage(#imageLiteral(resourceName: "clear.png"), for: .normal)
             self.clearButton.addTarget(self, action: #selector(self.tapClearDice), for: .touchUpInside)
             self.view.addSubview(self.clearButton)
@@ -600,7 +663,8 @@ class DiceViewController: UIViewController {
     func showDice() {
         print("showDice")
         
-        self.addClearButton()
+        addGetNowButton()
+        addClearButton()
         var xvalue:Int!
         let screenWidth = self.view.frame.width
         print("screenWidth = \(screenWidth)")
@@ -610,7 +674,7 @@ class DiceViewController: UIViewController {
         xvalue = xSpacing
         var yvalue = 80
         var zero = 0
-        self.view.addSubview(self.scrollView)
+        view.addSubview(scrollView)
         view.addSubview(percentageLabel)
         
         for _ in 0..<40 {
