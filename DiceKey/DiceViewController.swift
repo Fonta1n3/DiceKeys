@@ -10,13 +10,15 @@ import UIKit
 import BigInt
 import AVFoundation
 import SystemConfiguration
+import EFQRCode
 
 class DiceViewController: UIViewController {
-
+    
     @IBOutlet weak var scrollView: UIScrollView!
+    var keyDict = [[String:String]]()
     var password = ""
     var whatsThisTitle = "BIP39 Mnemonic"
-    var whatsThisMessage = "\"A seed phrase, seed recovery phrase or backup seed phrase is a list of words which store all the information needed to recover a Bitcoin wallet. Wallet software will typically generate a seed phrase and instruct the user to write it down on paper. If the user's computer breaks or their hard drive becomes corrupted, they can download the same wallet software again and use the paper backup to get their bitcoins back.\" Source: https://en.bitcoin.it/wiki/Seed_phrase\n\nThis recovery phrase is used to create a keychain that allows you to create an infinite amount of deterministic private keys and addresses known as child keys. The derivitaion scheme DiceKey uses is BIP44 which is the industry standard, for more info visit https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki/n/nThe deriviation path we use is m/44'/0'/0'/0"
+    var whatsThisMessage = "\"A seed phrase, seed recovery phrase or backup seed phrase is a list of words which store all the information needed to recover a Bitcoin wallet. Wallet software will typically generate a seed phrase and instruct the user to write it down on paper. If the user's computer breaks or their hard drive becomes corrupted, they can download the same wallet software again and use the paper backup to get their bitcoins back.\" Source: https://en.bitcoin.it/wiki/Seed_phrase\n\nThis recovery phrase is used to create a keychain that allows you to create an infinite amount of deterministic private keys and addresses known as child keys. The derivitaion scheme DiceKey uses is BIP44 which is the industry standard, for more info visit https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki\n\nThe deriviation path we use is m/44'/0'/0'/0"
     let infoButton = UIButton()
     var nextIndex = 0
     var seedDict = [String:Any]()
@@ -40,17 +42,26 @@ class DiceViewController: UIViewController {
     var bitCount:Int! = 0
     var clearButton = UIButton()
     let getNowButton = UIButton()
+    let passwordButton = UIButton()
+    let plusButton = UIButton()
+    let minusButton = UIButton()
+    var index = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
         print("ViewController viewDidLoad")
         
         showDice()
-        percentageLabel.frame = CGRect(x: view.frame.maxX / 2 - 50, y: view.frame.minY + 10, width: 100, height: 50)
-        percentageLabel.textColor = UIColor.white
-        percentageLabel.backgroundColor = UIColor.clear
+        percentageLabel.frame = CGRect(x: view.frame.maxX / 2 - 20, y: 50, width: 40, height: 40)
+        percentageLabel.textColor = UIColor.black
+        percentageLabel.backgroundColor = UIColor.white
+        percentageLabel.layer.cornerRadius = 20
+        percentageLabel.alpha = 0
+        percentageLabel.text = "0%"
+        percentageLabel.adjustsFontSizeToFitWidth = true
+        percentageLabel.clipsToBounds = true
         addShadow(view: percentageLabel)
-        percentageLabel.font = UIFont.init(name: "HelveticaNeue-Bold", size: 30)
+        percentageLabel.font = UIFont.init(name: "HelveticaNeue-Light", size: 15)
         percentageLabel.textAlignment = .center
         
     }
@@ -59,29 +70,154 @@ class DiceViewController: UIViewController {
         
         DispatchQueue.main.async {
             self.getNowButton.removeFromSuperview()
-            self.getNowButton.frame = CGRect(x: 5, y: 20, width: 90, height: 55)
+            self.getNowButton.frame = CGRect(x: 5, y: 20, width: 30, height: 30)
             self.getNowButton.showsTouchWhenHighlighted = true
-            self.getNowButton.setTitle("Get Now", for: .normal)
-            self.getNowButton.titleLabel?.font = UIFont.init(name: "HelveticaNeue-Bold", size: 20)
+            self.getNowButton.setImage(UIImage(named: "ok@3x.png"), for: .normal)
             self.getNowButton.backgroundColor = UIColor.clear
-            self.getNowButton.setTitleColor(UIColor.white, for: .normal)
             self.getNowButton.addTarget(self, action: #selector(self.getKeysNow), for: .touchUpInside)
             self.view.addSubview(self.getNowButton)
+            
+            self.passwordButton.removeFromSuperview()
+            self.passwordButton.frame = CGRect(x: (self.view.frame.maxX / 2) - 15, y: 20, width: 30, height: 30)
+            self.passwordButton.setImage(UIImage(named: "password@3x.png"), for: .normal)
+            self.passwordButton.backgroundColor = UIColor.clear
+            self.passwordButton.addTarget(self, action: #selector(self.setBIP39Password), for: .touchUpInside)
+            self.view.addSubview(self.passwordButton)
         }
         
    }
+    
+    func addPlusAndMinusButtons() {
+        
+        DispatchQueue.main.async {
+            
+            self.plusButton.removeFromSuperview()
+            self.minusButton.removeFromSuperview()
+            
+            self.plusButton.setImage(UIImage(named: "plus@3x.png"), for: .normal)
+            self.minusButton.setImage(UIImage(named: "minus@3x.png"), for: .normal)
+            
+            self.plusButton.layer.cornerRadius = 15
+            self.minusButton.layer.cornerRadius = 15
+            
+            self.plusButton.backgroundColor = UIColor.white
+            self.minusButton.backgroundColor = UIColor.white
+            
+            self.addShadow(view: self.plusButton)
+            self.addShadow(view: self.minusButton)
+            
+            self.plusButton.frame = CGRect(x: self.view.center.x + ((self.view.frame.width - 130) / 2), y: self.recoveryPhraseQRView.frame.minY - 40, width: 30, height: 30)
+            self.minusButton.frame = CGRect(x: self.view.center.x - ((self.view.frame.width - 70) / 2), y: self.recoveryPhraseQRView.frame.minY - 40, width: 30, height: 30)
+            
+            self.plusButton.addTarget(self, action: #selector(self.addToIndex), for: .touchUpInside)
+            self.minusButton.addTarget(self, action: #selector(self.minusFromIndex), for: .touchUpInside)
+            
+            self.view.addSubview(self.plusButton)
+            self.view.addSubview(self.minusButton)
+            
+        }
+        
+    }
+    
+    @objc func addToIndex() {
+        print("addToIndex")
+        
+        if self.index < 19 {
+            
+            self.index = self.index + 1
+            incrementViews()
+            
+        }
+        
+    }
+    
+    @objc func minusFromIndex() {
+        
+        if self.index > 0 {
+            
+            self.index = self.index - 1
+            incrementViews()
+            
+        }
+        
+    }
+    
+    func removePlusAndMinusButtons() {
+        
+        DispatchQueue.main.async {
+            
+            self.plusButton.removeFromSuperview()
+            self.minusButton.removeFromSuperview()
+            
+        }
+        
+    }
+    
+    func incrementViews() {
+        print("incrementViews")
+        
+        switch self.nextIndex {
+            
+        case 0:
+            
+            print("do nothing")
+            
+        case 1:
+            
+            DispatchQueue.main.async {
+                
+                let text = self.keyDict[self.index]["privateKey"]!
+                self.updateLabelsAndQrCode(header: "Private key at index \(self.index):", key: text)
+                self.whatsThisTitle = "WIF"
+                self.whatsThisMessage = "\"Wallet Import Format (WIF, also known as Wallet Export Format) is a way of encoding a private ECDSA key so as to make it easier to copy.\" Source: https://en.bitcoin.it/wiki/Wallet_import_format\n\nThis is the first private key your seed will produce, you can type your seed in on this website to confirm it worked correclty and the first private key at the 0 index should be identical: https://iancoleman.io/bip39/\n\nONLY TYPE TEST SEEDS INTO THE WEBSITE AS IT COULD COMPROMISE YOUR FUNDS."
+                
+            }
+            
+        case 2:
+            
+            DispatchQueue.main.async {
+                
+                let text = self.keyDict[self.index]["address"]!
+                self.updateLabelsAndQrCode(header: "Address at index \(self.index):", key: text)
+                self.whatsThisTitle = "Bitcoin Address"
+                self.whatsThisMessage = "\"A Bitcoin address, or simply address, is an identifier of 26-35 alphanumeric characters, beginning with the number 1 or 3, that represents a possible destination for a bitcoin payment. Addresses can be generated at no cost by any user of Bitcoin. For example, using Bitcoin Core, one can click \"New Address\" and be assigned an address. It is also possible to get a Bitcoin address using an account at an exchange or online wallet service.\" Source: https://en.bitcoin.it/wiki/Address\n\nThis address is the first address that is produced by your seed and can be found at the zero index on https://iancoleman.io/bip39/ it will be the address that is associated with the private key at the zero index.\n\nONLY TYPE TEST SEEDS INTO THE WEBSITE AS IT COULD COMPROMISE YOUR FUNDS"
+                
+            }
+            
+        case 3:
+            
+            DispatchQueue.main.async {
+                
+                let text = self.keyDict[self.index]["publicKey"]!
+                self.updateLabelsAndQrCode(header: "Public key at index \(self.index):", key: text)
+                self.whatsThisTitle = "Public Key"
+                self.whatsThisMessage = "A public key is used to create your Bitcoin address, you can also use this public to create multi sig wallets which is why we provide it here. For example you could share your public key with others for the purpose of creating a multi sig wallet with other individuals or for yourself. Multi sig wallets are the most secure way to store bitcoin. This public key is again only associated with the first child key your seed will produce."
+                
+            }
+            
+        case 4:
+            
+            print("do nothing")
+            
+        default:
+            
+            break
+            
+        }
+    }
     
     @objc func getKeysNow() {
         
         //insert alert
         DispatchQueue.main.async {
             
-            let alert = UIAlertController(title: "Attention!", message: "By tapping this button we will use any dice rolls you have made in conjunction with Apples cryptographically secure random number generator to create your recovery phrase", preferredStyle: UIAlertController.Style.actionSheet)
+            let alert = UIAlertController(title: "Attention!", message: "By tapping this button we will use any dice rolls you have made in conjunction with Apples cryptographically secure random number generator to create your keys. If you would only like to use your dice rolls then keep rolling more and DiceKeys will automatically generate the keys when you have rolled 256 bits worth of dice.", preferredStyle: UIAlertController.Style.actionSheet)
             
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Ok", comment: ""), style: .default, handler: { (action) in
+            alert.addAction(UIAlertAction(title: NSLocalizedString("Get Keys Now", comment: ""), style: .default, handler: { (action) in
                 
                 self.percentageLabel.removeFromSuperview()
                 self.clearButton.removeFromSuperview()
+                self.passwordButton.removeFromSuperview()
                 
                 for dice in self.diceArray {
                     dice.removeFromSuperview()
@@ -89,8 +225,10 @@ class DiceViewController: UIViewController {
                 self.diceArray.removeAll()
                 self.tappedIndex = 0
                 
-                self.seedDict  = createPrivateKey(viewController: self, password: self.password, diceRolls: self.joinedBits).0
-                let success = createPrivateKey(viewController: self, password: self.password, diceRolls: self.joinedBits).1
+                let dict = createKeyChain(viewController: self, password: self.password, diceRolls: self.joinedBits)
+                let success = dict["success"] as! Bool
+                self.seedDict = dict["seedDict"] as! [String:String]
+                self.keyDict = dict["keyArray"] as! [[String:String]]
                 
                 if success {
                     
@@ -203,6 +341,9 @@ class DiceViewController: UIViewController {
             alert.addAction(UIAlertAction(title: NSLocalizedString("Go Back", comment: ""), style: .destructive, handler: { (action) in
                 
                 DispatchQueue.main.async {
+                    
+                    self.percentageLabel.alpha = 0
+                    self.percentageLabel.text = "0%"
                     self.mnemonicLabel.text = ""
                     self.password = ""
                     self.recoveryPhraseQRView.image = nil
@@ -215,6 +356,7 @@ class DiceViewController: UIViewController {
                     self.nextButton.removeFromSuperview()
                     self.button.removeFromSuperview()
                     self.showDice()
+                    
                 }
                 
             }))
@@ -240,56 +382,63 @@ class DiceViewController: UIViewController {
         print("showPrivateKeyAndAddressQRCodes")
         
         getNowButton.removeFromSuperview()
+        passwordButton.removeFromSuperview()
         
         button.removeFromSuperview()
-        button = UIButton(frame: CGRect(x: 5, y: view.frame.maxY - 60, width: 90, height: 55))
+        button.frame = CGRect(x: 5, y: view.frame.maxY - 40, width: 30, height: 30)
         button.showsTouchWhenHighlighted = true
-        button.setTitle("Done", for: .normal)
-        button.titleLabel?.font = UIFont.init(name: "HelveticaNeue-Bold", size: 20)
-        button.backgroundColor = UIColor.clear
+        button.setImage(UIImage(named: "cancel@3x.png"), for: .normal)
+        button.backgroundColor = UIColor.white
+        button.layer.cornerRadius = 15
         addShadow(view: button)
-        button.setTitleColor(UIColor.white, for: .normal)
         button.addTarget(self, action: #selector(home), for: .touchUpInside)
         view.addSubview(button)
         
-        self.mnemonicLabel.frame = CGRect(x: 5, y: 25, width: self.view.frame.width - 10, height: 60)
-        self.mnemonicLabel.text = "Your recovery phrase/seed:"
-        self.mnemonicLabel.adjustsFontSizeToFitWidth = true
-        self.mnemonicLabel.numberOfLines = 0
-        self.mnemonicLabel.font = UIFont.init(name: "HelveticaNeue-Bold", size: 30)
-        self.mnemonicLabel.textColor = UIColor.white
-        self.mnemonicLabel.textAlignment = .center
-        self.mnemonicLabel.alpha = 0
-        self.view.addSubview(self.mnemonicLabel)
+        mnemonicLabel.frame = CGRect(x: 10, y: 18, width: self.view.frame.width - 10, height: 40)
+        mnemonicLabel.text = "Recovery phrase:"
+        mnemonicLabel.adjustsFontSizeToFitWidth = true
+        mnemonicLabel.numberOfLines = 0
+        addShadow(view: mnemonicLabel)
+        mnemonicLabel.font = UIFont.init(name: "HelveticaNeue", size: 20)
+        mnemonicLabel.textColor = UIColor.white
+        mnemonicLabel.textAlignment = .left
+        mnemonicLabel.alpha = 0
+        view.addSubview(mnemonicLabel)
         
-        self.recoveryPhraseImage = self.generateQrCode(key: self.words)
-        self.recoveryPhraseQRView = UIImageView(image: self.recoveryPhraseImage!)
-        self.recoveryPhraseQRView.frame = CGRect(x: self.view.center.x - ((self.view.frame.width - 70) / 2), y: self.view.center.y / 2.5, width: self.view.frame.width - 70, height: self.view.frame.width - 70)
-        self.recoveryPhraseQRView.alpha = 0
-        self.view.addSubview(self.recoveryPhraseQRView)
+        recoveryPhraseImage = generateQrCode(key: words)
+        recoveryPhraseQRView = UIImageView(image: recoveryPhraseImage!)
+        recoveryPhraseQRView.frame = CGRect(x: view.center.x - ((view.frame.width - 70) / 2), y: view.center.y / 3, width: view.frame.width - 70, height: view.frame.width - 70)
+        recoveryPhraseQRView.alpha = 0
+        addShadow(view: recoveryPhraseQRView)
+        recoveryPhraseQRView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(imageTapped)))
+        recoveryPhraseQRView.isUserInteractionEnabled = true
+        view.addSubview(recoveryPhraseQRView)
         
         
-        infoButton.frame = CGRect(x: 50, y: self.recoveryPhraseQRView.frame.minY - 25, width: self.view.frame.width - 100, height: 20)
-        infoButton.setTitle("What's this?", for: .normal)
-        infoButton.titleLabel?.textAlignment = .center
-        infoButton.setTitleColor(UIColor.white, for: .normal)
-        infoButton.titleLabel?.font = UIFont.init(name: "HelveticaNeue-Bold", size: 20)
+        infoButton.frame = CGRect(x: view.frame.maxX - 40, y: 24, width: 30, height: 30)
+        infoButton.setImage(UIImage(named: "help@3x.png"), for: .normal)
+        infoButton.backgroundColor = UIColor.white
+        infoButton.layer.cornerRadius = 15
+        addShadow(view: infoButton)
         infoButton.addTarget(self, action: #selector(self.showInfo), for: .touchUpInside)
-        infoButton.backgroundColor = UIColor.clear
-        self.view.addSubview(infoButton)
+        view.addSubview(infoButton)
         
-        myField.frame = CGRect(x: 5, y: recoveryPhraseQRView.frame.maxY + 5, width: self.view.frame.width - 20, height: 110)
-        myField.text = self.words
-        myField.backgroundColor = UIColor.black
+        myField.frame = CGRect(x: 5, y: recoveryPhraseQRView.frame.maxY + 10, width: view.frame.width - 10, height: 110)
+        myField.text = words
+        myField.backgroundColor = UIColor.clear
+        addShadow(view: myField)
         myField.clipsToBounds = true
         myField.layer.cornerRadius = 10
+        let tap = UITapGestureRecognizer(target: self, action: #selector(self.shareText))
+        myField.isUserInteractionEnabled = true
+        myField.addGestureRecognizer(tap)
         myField.adjustsFontSizeToFitWidth = true
-        myField.textColor = UIColor.green
+        myField.textColor = UIColor.white
         myField.numberOfLines = 0
-        myField.textAlignment = .center
-        myField.font = UIFont.init(name: "HelveticaNeue-Bold", size: 18)
+        myField.textAlignment = .natural
+        myField.font = UIFont.init(name: "HelveticaNeue", size: 18)
         myField.alpha = 0
-        self.view.addSubview(self.myField)
+        view.addSubview(myField)
         
         UIView.animate(withDuration: 0.5, animations: {
             
@@ -311,18 +460,24 @@ class DiceViewController: UIViewController {
     func generateQrCode(key: String) -> UIImage? {
         print("generateQrCode")
         
-        let ciContext = CIContext()
-        let data = key.data(using: String.Encoding.ascii)
-        if let filter = CIFilter(name: "CIQRCodeGenerator") {
-            filter.setValue(data, forKey: "inputMessage")
-            let transform = CGAffineTransform(scaleX: 10, y: 10)
-            let upScaledImage = filter.outputImage?.transformed(by: transform)
-            let cgImage = ciContext.createCGImage(upScaledImage!, from: upScaledImage!.extent)
-            let qrImage = UIImage(cgImage: cgImage!)
-            return qrImage
-        }
+        let cgImage = EFQRCode.generate(content: key,
+                                        size: EFIntSize.init(width: 256, height: 256),
+                                        backgroundColor: UIColor.white.cgColor,
+                                        foregroundColor: UIColor.black.cgColor,
+                                        watermark: nil,
+                                        watermarkMode: EFWatermarkMode.scaleAspectFit,
+                                        inputCorrectionLevel: EFInputCorrectionLevel.h,
+                                        icon: nil,
+                                        iconSize: nil,
+                                        allowTransparent: true,
+                                        pointShape: EFPointShape.circle,
+                                        mode: EFQRCodeMode.none,
+                                        binarizationThreshold: 0,
+                                        magnification: EFIntSize.init(width: 50, height: 50),
+                                        foregroundPointOffset: 0)
+        let qrImage = UIImage(cgImage: cgImage!)
         
-        return nil
+        return qrImage
         
     }
     
@@ -330,13 +485,12 @@ class DiceViewController: UIViewController {
         print("addNextButton")
         
         DispatchQueue.main.async {
-            self.nextButton = UIButton(frame: CGRect(x: self.view.frame.maxX - 90, y: self.view.frame.maxY - 60, width: 80, height: 55))
+            self.nextButton = UIButton(frame: CGRect(x: self.view.frame.maxX - 40, y: self.view.frame.maxY - 40, width: 30, height: 30))
             self.nextButton.showsTouchWhenHighlighted = true
-            self.nextButton.setTitle("Next", for: .normal)
-            self.nextButton.setTitleColor(UIColor.white, for: .normal)
-            self.nextButton.backgroundColor = UIColor.clear
+            self.nextButton.setImage(UIImage(named: "refresh@3x.png"), for: .normal)
+            self.nextButton.backgroundColor = UIColor.white
+            self.nextButton.layer.cornerRadius = 15
             self.addShadow(view: self.nextButton)
-            self.nextButton.titleLabel?.font = UIFont.init(name: "HelveticaNeue-Bold", size: 20)
             self.nextButton.addTarget(self, action: #selector(self.showNext), for: .touchUpInside)
             self.view.addSubview(self.nextButton)
         }
@@ -346,7 +500,7 @@ class DiceViewController: UIViewController {
     @objc func showNext() {
         print("next")
         
-        let maxCount = self.seedDict.count
+        let maxCount = 5
         
         if self.nextIndex < maxCount {
             
@@ -365,44 +519,71 @@ class DiceViewController: UIViewController {
         }
         
         switch self.nextIndex {
+            
         case 0:
+            
             DispatchQueue.main.async {
+                
                 let text = self.seedDict["seed"] as! String
-                self.updateLabelsAndQrCode(header: "Your recovery phrase/seed:", key: text)
+                self.updateLabelsAndQrCode(header: "Recovery phrase:", key: text)
+                self.removePlusAndMinusButtons()
                 self.whatsThisTitle = "BIP39 Mnemonic"
-                self.whatsThisMessage = "\"A seed phrase, seed recovery phrase or backup seed phrase is a list of words which store all the information needed to recover a Bitcoin wallet. Wallet software will typically generate a seed phrase and instruct the user to write it down on paper. If the user's computer breaks or their hard drive becomes corrupted, they can download the same wallet software again and use the paper backup to get their bitcoins back.\" Source: https://en.bitcoin.it/wiki/Seed_phrase\n\nThis recovery phrase is used to create a keychain that allows you to create an infinite amount of deterministic private keys and addresses known as child keys. The derivitaion scheme DiceKey uses is BIP44 which is the industry standard, for more info visit https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki/n/nThe deriviation path we use is m/44'/0'/0'/0"
+                self.whatsThisMessage = "\"A seed phrase, seed recovery phrase or backup seed phrase is a list of words which store all the information needed to recover a Bitcoin wallet. Wallet software will typically generate a seed phrase and instruct the user to write it down on paper. If the user's computer breaks or their hard drive becomes corrupted, they can download the same wallet software again and use the paper backup to get their bitcoins back.\" Source: https://en.bitcoin.it/wiki/Seed_phrase\n\nThis recovery phrase is used to create a keychain that allows you to create an infinite amount of deterministic private keys and addresses known as child keys. The derivitaion scheme DiceKey uses is BIP44 which is the industry standard, for more info visit https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki\n\nThe deriviation path we use is m/44'/0'/0'/0"
+                
             }
+            
         case 1:
+            
             DispatchQueue.main.async {
-                let text = self.seedDict["privateKey"] as! String
-                self.updateLabelsAndQrCode(header: "Your private key WIF at index 0:", key: text)
+                
+                let text = self.keyDict[self.index]["privateKey"]!
+                self.updateLabelsAndQrCode(header: "Private key at index \(self.index):", key: text)
+                self.addPlusAndMinusButtons()
                 self.whatsThisTitle = "WIF"
                 self.whatsThisMessage = "\"Wallet Import Format (WIF, also known as Wallet Export Format) is a way of encoding a private ECDSA key so as to make it easier to copy.\" Source: https://en.bitcoin.it/wiki/Wallet_import_format\n\nThis is the first private key your seed will produce, you can type your seed in on this website to confirm it worked correclty and the first private key at the 0 index should be identical: https://iancoleman.io/bip39/\n\nONLY TYPE TEST SEEDS INTO THE WEBSITE AS IT COULD COMPROMISE YOUR FUNDS."
+                
             }
+            
         case 2:
+            
             DispatchQueue.main.async {
-                let text = self.seedDict["address"] as! String
-                self.updateLabelsAndQrCode(header: "Your address at index 0:", key: text)
+                
+                let text = self.keyDict[self.index]["address"]!
+                self.updateLabelsAndQrCode(header: "Address at index \(self.index):", key: text)
+                //self.addPlusAndMinusButtons()
                 self.whatsThisTitle = "Bitcoin Address"
                 self.whatsThisMessage = "\"A Bitcoin address, or simply address, is an identifier of 26-35 alphanumeric characters, beginning with the number 1 or 3, that represents a possible destination for a bitcoin payment. Addresses can be generated at no cost by any user of Bitcoin. For example, using Bitcoin Core, one can click \"New Address\" and be assigned an address. It is also possible to get a Bitcoin address using an account at an exchange or online wallet service.\" Source: https://en.bitcoin.it/wiki/Address\n\nThis address is the first address that is produced by your seed and can be found at the zero index on https://iancoleman.io/bip39/ it will be the address that is associated with the private key at the zero index.\n\nONLY TYPE TEST SEEDS INTO THE WEBSITE AS IT COULD COMPROMISE YOUR FUNDS"
+                
             }
+            
         case 3:
+            
             DispatchQueue.main.async {
-                let text = self.seedDict["publicKey"] as! String
-                self.updateLabelsAndQrCode(header: "Your compressed public key at index 0:", key: text)
+                
+                let text = self.keyDict[self.index]["publicKey"]!
+                self.updateLabelsAndQrCode(header: "Public key at index \(self.index):", key: text)
+                //self.addPlusAndMinusButtons()
                 self.whatsThisTitle = "Public Key"
                 self.whatsThisMessage = "A public key is used to create your Bitcoin address, you can also use this public to create multi sig wallets which is why we provide it here. For example you could share your public key with others for the purpose of creating a multi sig wallet with other individuals or for yourself. Multi sig wallets are the most secure way to store bitcoin. This public key is again only associated with the first child key your seed will produce."
+                
             }
+            
         case 4:
+            
             DispatchQueue.main.async {
+                
                 let text = self.seedDict["xpub"] as! String
-                self.updateLabelsAndQrCode(header: "Your xpub:", key: text)
+                self.updateLabelsAndQrCode(header: "XPUB:", key: text)
+                self.removePlusAndMinusButtons()
                 self.whatsThisTitle = "BIP32 Extended Public Key"
                 self.whatsThisMessage = "This a an extended public key which you can use to create an infinite amount of addresses, its a great way to create a watch only wallet where you can easily create a new address to receive payments without storing your private keys. It is important to not show anyone else your xpub as that can increase their chances at getting access to your Bitcoin."
+                
             }
             
         default:
+            
             break
+            
         }
         
     }
@@ -411,18 +592,31 @@ class DiceViewController: UIViewController {
         print("updateLabelsAndQrCode")
         
         DispatchQueue.main.async {
-            self.mnemonicLabel.text = header
+            
             self.recoveryPhraseImage = self.generateQrCode(key: key)
-            self.recoveryPhraseQRView.image = self.recoveryPhraseImage
-            self.myField.text = key
+            
+            UIView.transition(with: self.recoveryPhraseQRView,
+                              duration: 0.75,
+                              options: .transitionCrossDissolve,
+                              animations: { self.recoveryPhraseQRView.image = self.recoveryPhraseImage },
+                              completion: nil)
+            
+            UIView.transition(with: self.mnemonicLabel,
+                              duration: 0.75,
+                              options: .transitionCrossDissolve,
+                              animations: { self.mnemonicLabel.text = header },
+                              completion: nil)
+            
+            UIView.transition(with: self.myField,
+                              duration: 0.75,
+                              options: .transitionCrossDissolve,
+                              animations: { self.myField.text = key },
+                              completion: nil)
+            
+            UIImpactFeedbackGenerator().impactOccurred()
+            
         }
-    }
-    
-    func getDocumentsDirectory() -> URL {
-        print("getDocumentsDirectory")
         
-        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        return paths[0]
     }
     
     func addPercentageCompleteLabel() {
@@ -439,7 +633,7 @@ class DiceViewController: UIViewController {
         
         DispatchQueue.main.async {
             self.clearButton.removeFromSuperview()
-            self.clearButton.frame = CGRect(x: self.view.frame.maxX - 60, y: 20, width: 55 , height: 55)
+            self.clearButton.frame = CGRect(x: self.view.frame.maxX - 40, y: 20, width: 30, height: 30)
             self.clearButton.setImage(#imageLiteral(resourceName: "clear.png"), for: .normal)
             self.clearButton.addTarget(self, action: #selector(self.tapClearDice), for: .touchUpInside)
             self.view.addSubview(self.clearButton)
@@ -533,10 +727,10 @@ class DiceViewController: UIViewController {
                             self.diceArray.removeAll()
                             self.tappedIndex = 0
                             
-                            self.seedDict = diceKey(viewController: self, userRandomness: self.parseBitResult, password: self.password).0
-                            let success = diceKey(viewController: self, userRandomness: self.parseBitResult, password: self.password).1
-                            
-                            print("array = \(self.seedDict)")
+                            let dict = createKeyChain(viewController: self, password: self.password, diceRolls: self.joinedBits)
+                            let success = dict["success"] as! Bool
+                            self.seedDict = dict["seedDict"] as! [String:String]
+                            self.keyDict = dict["keyArray"] as! [[String:String]]
                             
                             if success {
                                 
@@ -547,6 +741,7 @@ class DiceViewController: UIViewController {
                             } else {
                                 
                                 self.displayAlert(viewController: self, title: "Error", message: "We apologize, that really shouldn't have happened... Please email us at BitSenseApp@gmail.com and let us know what happened so we can fix it.")
+                                
                             }
                             
                         }
@@ -565,9 +760,12 @@ class DiceViewController: UIViewController {
     
     @objc func tapDice(sender: UIButton!) {
         
+        percentageLabel.alpha = 1
+        
         let diceNumber = Int((sender.titleLabel?.text)!)!
         sender.titleLabel?.textColor = UIColor.clear
         sender.titleLabel?.backgroundColor = UIColor.clear
+        sender.titleLabel?.alpha = 0
         
         func addDiceValue() {
             
@@ -615,49 +813,53 @@ class DiceViewController: UIViewController {
             
         }
         
-        //if isInternetAvailable() == false {
+        if isInternetAvailable() == false {
         
-        if sender.tag == 1 && diceNumber == 0 {
+            if sender.tag == 1 && diceNumber == 0 {
             
-            self.tappedIndex = sender.tag
-            addDiceValue()
+                self.tappedIndex = sender.tag
+                addDiceValue()
             
-        } else if sender.tag == self.tappedIndex + 1 {
+            } else if sender.tag == self.tappedIndex + 1 {
             
-            self.tappedIndex = sender.tag
-            addDiceValue()
-            creatBitKey()
+                self.tappedIndex = sender.tag
+                addDiceValue()
+                creatBitKey()
             
-        } else if sender.tag == self.tappedIndex {
+            } else if sender.tag == self.tappedIndex {
             
-            addDiceValue()
+                addDiceValue()
             
+            } else {
+            
+                DispatchQueue.main.async {
+                
+                    let alert = UIAlertController(title: NSLocalizedString("You must input dice values in order.", comment: ""), message: "In order for the key to be cryptographically secure you must input the actual values of your dice as they appear to you from left to right, in order row by row.\n\nStart with the top left dice and work your way to the right being very careful to ensure you input the dice values correctly.", preferredStyle: UIAlertController.Style.alert)
+                
+                    alert.addAction(UIAlertAction(title: NSLocalizedString("Ok, got it", comment: ""), style: .default, handler: { (action) in }))
+                
+                    alert.addAction(UIAlertAction(title: NSLocalizedString("Why?", comment: ""), style: .default, handler: { (action) in
+                    
+                        self.displayAlert(viewController: self, title: "", message: "We make it impossible for you to input the dice values out of order becasue we don't want you to accidentally create a Private Key that is not based on true cryptographic secure randomness. We also do this to make it impossible for you to accidentally tap and change a value of a dice you have already input. Secure keys ARE WORTH the effort!")
+                    
+                    }))
+                
+                    self.present(alert, animated: true, completion: nil)
+                
+                }
+            
+            }
+        
         } else {
-            
+         
             DispatchQueue.main.async {
-                
-                let alert = UIAlertController(title: NSLocalizedString("You must input dice values in order.", comment: ""), message: "In order for the key to be cryptographically secure you must input the actual values of your dice as they appear to you from left to right, in order row by row.\n\nStart with the top left dice and work your way to the right being very careful to ensure you input the dice values correctly.", preferredStyle: UIAlertController.Style.alert)
-                
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Ok, got it", comment: ""), style: .default, handler: { (action) in }))
-                
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Why?", comment: ""), style: .default, handler: { (action) in
-                    
-                    self.displayAlert(viewController: self, title: "", message: "We make it impossible for you to input the dice values out of order becasue we don't want you to accidentally create a Private Key that is not based on true cryptographic secure randomness. We also do this to make it impossible for you to accidentally tap and change a value of a dice you have already input. Secure keys ARE WORTH the effort!")
-                    
-                }))
-                
-                self.present(alert, animated: true, completion: nil)
-                
+            
+                self.displayAlert(viewController: self, title: "Turn on airplane mode and wifi off to create private keys securely.", message: "The idea is to never let your Bitcoin private key touch the interent, secure keys are worth the effort.")
+            
             }
             
         }
         
-        /*} else {
-         
-         DispatchQueue.main.async {
-         self.displayAlert(viewController: self, title: "Turn on airplane mode and wifi off to create private keys securely.", message: "The idea is to never let your Bitcoin private key touch the interent, secure keys are worth the effort.")
-         }
-         }*/
     }
     
     func showDice() {
@@ -667,7 +869,6 @@ class DiceViewController: UIViewController {
         addClearButton()
         var xvalue:Int!
         let screenWidth = self.view.frame.width
-        print("screenWidth = \(screenWidth)")
         let width = Int(screenWidth / 6)
         let height = width
         let xSpacing = width / 6
@@ -686,6 +887,7 @@ class DiceViewController: UIViewController {
                 self.diceButton.showsTouchWhenHighlighted = true
                 self.diceButton.backgroundColor = .clear
                 self.diceButton.setTitle("\(0)", for: .normal)
+                self.diceButton.titleLabel?.alpha = 0
                 self.diceButton.addTarget(self, action: #selector(self.tapDice), for: .touchUpInside)
                 self.diceArray.append(self.diceButton)
                 self.scrollView.addSubview(self.diceButton)
@@ -700,10 +902,9 @@ class DiceViewController: UIViewController {
             
         }
         
-        setBIP39Password()
     }
     
-    func setBIP39Password() {
+    @objc func setBIP39Password() {
         
         DispatchQueue.main.async {
             var firstPassword = String()
@@ -763,6 +964,78 @@ class DiceViewController: UIViewController {
             }))
             
             self.present(alert, animated: true, completion: nil)
+        }
+        
+    }
+    
+    @objc func shareQRCode() {
+        
+        DispatchQueue.main.async {
+                
+                let activityController = UIActivityViewController(activityItems: [self.recoveryPhraseQRView.image as Any], applicationActivities: nil)
+                self.present(activityController, animated: true, completion: nil)
+            
+        }
+        
+    }
+    
+    @objc func shareText() {
+        
+        DispatchQueue.main.async {
+            
+            let textToShare = [self.myField.text]
+            let activityViewController = UIActivityViewController(activityItems: textToShare as [Any], applicationActivities: nil)
+            
+            UIView.animate(withDuration: 0.3, animations: {
+                
+                self.myField.alpha = 0
+                
+            }, completion: { _ in
+                
+                UIView.animate(withDuration: 0.3, animations: {
+                    
+                    self.myField.alpha = 1
+                    
+                })
+                
+                self.present(activityViewController, animated: true, completion: nil)
+                
+            })
+            
+            
+            
+            
+        }
+        
+    }
+    
+    func getDocumentsDirectory() -> URL {
+        print("getDocumentsDirectory")
+        
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        return paths[0]
+        
+    }
+    
+    @objc private func imageTapped(_ recognizer: UITapGestureRecognizer) {
+        print("image tapped")
+        
+        shareQRCode()
+        
+        DispatchQueue.main.async {
+            
+            UIView.animate(withDuration: 0.2, animations: {
+                
+                self.recoveryPhraseQRView.alpha = 0
+                
+            }) { _ in
+                
+                UIView.animate(withDuration: 0.2) {
+                    self.recoveryPhraseQRView.alpha = 1
+                }
+                
+            }
+            
         }
         
     }

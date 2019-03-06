@@ -10,14 +10,14 @@ import Foundation
 import BigInt
 import UIKit
 
-public func diceKey(viewController: UIViewController, userRandomness: BigInt, password: String) -> ([String:Any], Bool) {
+public func diceKey(viewController: UIViewController, userRandomness: BigInt, password: String) -> [String:Any] {
     
     var words = ""
     var recoveryPhrase = String()
     let data = BigUInt(userRandomness).serialize()
     var success = Bool()
-    
     let sha256OfData = BTCSHA256(data)
+    var keyArray = [[String:String]]()
         
     if let mnemonic = BTCMnemonic.init(entropy: sha256OfData as Data!, password: password, wordListType: BTCMnemonicWordListType.english) {
             
@@ -27,21 +27,35 @@ public func diceKey(viewController: UIViewController, userRandomness: BigInt, pa
         recoveryPhrase = formatMnemonic2.replacingOccurrences(of: ",", with: "")
             
         if let keychain = mnemonic.keychain.derivedKeychain(withPath: "m/44'/0'/0'/0") {
+            
             keychain.key.isPublicKeyCompressed = true
-            let addressHD = (keychain.key(at: 0).address.string)
-            let privateKey = (keychain.key(at: 0).wif)!
-            let publicKey = (keychain.key(at: 0).compressedPublicKey.hex())!
             let xpub = (keychain.extendedPublicKey)!
+            
+            for i in 0 ... 19 {
+               
+                let int = UInt32(i)
+                let addressHD = (keychain.key(at: int).address.string)
+                let privateKey = (keychain.key(at: int).wif)!
+                let publicKey = (keychain.key(at: int).compressedPublicKey.hex())!
+                keyArray.append(["privateKey":privateKey, "address":addressHD, "publicKey":publicKey])
+                
+            }
+            
             keychain.key.clear()
             success = true
-            return (["seed":recoveryPhrase, "privateKey":privateKey, "address":addressHD, "publicKey":publicKey, "xpub":xpub], success)
+            
+            return ["seedDict":["seed":recoveryPhrase, "xpub":xpub], "keyArray":keyArray, "success":success]
+            
         }
         
-        
     } else {
-        return (["":""], false)
+        
+        return ["seedDict":["seed":"", "xpub":""], "keyArray":"", "success":false]
+        
     }
-    return (["":""], false)
+    
+    return ["seedDict":["seed":"", "xpub":""], "keyArray":"", "success":false]
+    
 }
 
 

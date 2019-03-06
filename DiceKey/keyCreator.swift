@@ -9,22 +9,35 @@
 import Foundation
 import Security
 import UIKit
+import BigInt
 
-public func createPrivateKey(viewController: UIViewController, password: String, diceRolls: String) -> ([String:Any], Bool) {
+public func createKeyChain(viewController: UIViewController, password: String, diceRolls: String) -> [String:Any] {
     
     var success = Bool()
     let bytesCount = 32
-    var randomNum = ""
     var randomBytes = [UInt8](repeating: 0, count: bytesCount)
     let status = SecRandomCopyBytes(kSecRandomDefault, bytesCount, &randomBytes)
+    var keyArray = [[String:String]]()
+    var dictToReturn = [String:Any]()
     
     if status == errSecSuccess {
         
-        randomNum = randomBytes.map({String(format: "%02hhx", $0)}).joined(separator: "")
-        randomNum = randomNum + diceRolls
-        let sha256OfData = BTCSHA256(BTCDataFromHex(randomNum))
+        var data = Data(bytes: randomBytes)
         
-        if let mnemonic = BTCMnemonic.init(entropy: sha256OfData as Data!, password: password, wordListType: BTCMnemonicWordListType.english) {
+        if diceRolls != "" {
+            
+            if let diceIntCheck = BigUInt.init(diceRolls) {
+                
+                let diceData = BigUInt(diceIntCheck).serialize()
+                data = data + diceData
+                
+            }
+            
+        }
+        
+        let sha256OfData = BTCSHA256(data) as Data
+        
+        if let mnemonic = BTCMnemonic.init(entropy: sha256OfData, password: password, wordListType: BTCMnemonicWordListType.english) {
             
             let words = mnemonic.words.description
             let formatMnemonic1 = words.replacingOccurrences(of: "[", with: "")
@@ -32,28 +45,38 @@ public func createPrivateKey(viewController: UIViewController, password: String,
             let recoveryPhrase = formatMnemonic2.replacingOccurrences(of: ",", with: "")
             
             if let keychain = mnemonic.keychain.derivedKeychain(withPath: "m/44'/0'/0'/0") {
+                
                 keychain.key.isPublicKeyCompressed = true
-                let addressHD = (keychain.key(at: 0).address.string)
-                let privateKey = (keychain.key(at: 0).wif)!
-                let publicKey = (keychain.key(at: 0).compressedPublicKey.hex())!
                 let xpub = (keychain.extendedPublicKey)!
+                
+                for i in 0 ... 19 {
+                    
+                    let int = UInt32(i)
+                    let addressHD = (keychain.key(at: int).address.string)
+                    let privateKey = (keychain.key(at: int).wif)!
+                    let publicKey = (keychain.key(at: int).compressedPublicKey.hex())!
+                    keyArray.append(["privateKey":privateKey, "address":addressHD, "publicKey":publicKey])
+                    
+                }
+                
                 keychain.key.clear()
                 success = true
+                dictToReturn = ["seedDict":["seed":recoveryPhrase, "xpub":xpub], "keyArray":keyArray, "success":success]
                 
-                return (["seed":recoveryPhrase, "privateKey":privateKey, "address":addressHD, "publicKey":publicKey, "xpub":xpub], success)
             }
-            
             
         } else {
             
-            return (["":""], false)
+            dictToReturn = ["seedDict":["seed":"", "xpub":""], "keyArray":"", "success":false]
             
         }
         
-        return (["":""], false)
-    
+    } else {
+        
+        dictToReturn = ["seedDict":["seed":"", "xpub":""], "keyArray":"", "success":false]
+        
     }
     
-    return (["":""], false)
+    return dictToReturn
     
 }

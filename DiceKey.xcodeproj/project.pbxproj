@@ -17,7 +17,16 @@
 		D01A466922106FC900ECE267 /* BigInt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D01A466822106FC900ECE267 /* BigInt.framework */; };
 		D01A466B22106FCF00ECE267 /* SipHash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D01A466A22106FCF00ECE267 /* SipHash.framework */; };
 		D020B19D2217F7F50082B157 /* keyCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D020B19C2217F7F50082B157 /* keyCreator.swift */; };
+		D0756A5F22202410004EFD6E /* brain.png in Resources */ = {isa = PBXBuildFile; fileRef = D0756A5E22202410004EFD6E /* brain.png */; };
+		D0756A6122202677004EFD6E /* whiteCheck.png in Resources */ = {isa = PBXBuildFile; fileRef = D0756A6022202677004EFD6E /* whiteCheck.png */; };
 		D094D0712211AB760042611E /* DiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D094D0702211AB760042611E /* DiceViewController.swift */; };
+		D0A6C097222F7C4000F87645 /* help@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0A6C096222F7C4000F87645 /* help@3x.png */; };
+		D0A6C09B222F89EF00F87645 /* plus@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0A6C09A222F89EF00F87645 /* plus@3x.png */; };
+		D0A6C09D222F89FC00F87645 /* minus@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0A6C09C222F89FB00F87645 /* minus@3x.png */; };
+		D0A6C09F222F8AD400F87645 /* refresh@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0A6C09E222F8AD400F87645 /* refresh@3x.png */; };
+		D0A6C0A1222F921000F87645 /* cancel@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0A6C0A0222F921000F87645 /* cancel@3x.png */; };
+		D0A6C0A3222F953A00F87645 /* password@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0A6C0A2222F953A00F87645 /* password@3x.png */; };
+		D0A6C0A5222F97E800F87645 /* ok@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0A6C0A4222F97E800F87645 /* ok@3x.png */; };
 		D0C9FA6122110FFC00C91BF4 /* diceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C9FA6022110FFC00C91BF4 /* diceCreator.swift */; };
 		D0C9FA68221112F200C91BF4 /* dice3.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C9FA63221112F100C91BF4 /* dice3.png */; };
 		D0C9FA69221112F200C91BF4 /* dice5.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C9FA64221112F100C91BF4 /* dice5.png */; };
@@ -44,7 +53,16 @@
 		D01A466822106FC900ECE267 /* BigInt.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BigInt.framework; path = Carthage/Build/iOS/BigInt.framework; sourceTree = "<group>"; };
 		D01A466A22106FCF00ECE267 /* SipHash.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SipHash.framework; path = Carthage/Build/iOS/SipHash.framework; sourceTree = "<group>"; };
 		D020B19C2217F7F50082B157 /* keyCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = keyCreator.swift; sourceTree = "<group>"; };
+		D0756A5E22202410004EFD6E /* brain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brain.png; sourceTree = "<group>"; };
+		D0756A6022202677004EFD6E /* whiteCheck.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteCheck.png; sourceTree = "<group>"; };
 		D094D0702211AB760042611E /* DiceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiceViewController.swift; sourceTree = "<group>"; };
+		D0A6C096222F7C4000F87645 /* help@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "help@3x.png"; sourceTree = "<group>"; };
+		D0A6C09A222F89EF00F87645 /* plus@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plus@3x.png"; sourceTree = "<group>"; };
+		D0A6C09C222F89FB00F87645 /* minus@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "minus@3x.png"; sourceTree = "<group>"; };
+		D0A6C09E222F8AD400F87645 /* refresh@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "refresh@3x.png"; sourceTree = "<group>"; };
+		D0A6C0A0222F921000F87645 /* cancel@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cancel@3x.png"; sourceTree = "<group>"; };
+		D0A6C0A2222F953A00F87645 /* password@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "password@3x.png"; sourceTree = "<group>"; };
+		D0A6C0A4222F97E800F87645 /* ok@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ok@3x.png"; sourceTree = "<group>"; };
 		D0C9FA6022110FFC00C91BF4 /* diceCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = diceCreator.swift; sourceTree = "<group>"; };
 		D0C9FA63221112F100C91BF4 /* dice3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dice3.png; sourceTree = "<group>"; };
 		D0C9FA64221112F100C91BF4 /* dice5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dice5.png; sourceTree = "<group>"; };
@@ -109,6 +127,15 @@
 				D01A46552210651300ECE267 /* Assets.xcassets */,
 				D01A46572210651300ECE267 /* LaunchScreen.storyboard */,
 				D094D0702211AB760042611E /* DiceViewController.swift */,
+				D0A6C0A0222F921000F87645 /* cancel@3x.png */,
+				D0756A6022202677004EFD6E /* whiteCheck.png */,
+				D0A6C096222F7C4000F87645 /* help@3x.png */,
+				D0A6C09A222F89EF00F87645 /* plus@3x.png */,
+				D0A6C0A2222F953A00F87645 /* password@3x.png */,
+				D0A6C09C222F89FB00F87645 /* minus@3x.png */,
+				D0A6C09E222F8AD400F87645 /* refresh@3x.png */,
+				D0A6C0A4222F97E800F87645 /* ok@3x.png */,
+				D0756A5E22202410004EFD6E /* brain.png */,
 				D020B19C2217F7F50082B157 /* keyCreator.swift */,
 				D01A465A2210651300ECE267 /* Info.plist */,
 				D01A46522210650C00ECE267 /* DiceKey.xcdatamodeld */,
@@ -204,16 +231,25 @@
 			buildActionMask = 2147483647;
 			files = (
 				D0C9FA68221112F200C91BF4 /* dice3.png in Resources */,
+				D0A6C0A1222F921000F87645 /* cancel@3x.png in Resources */,
 				D0C9FA6B221112F200C91BF4 /* dice1.png in Resources */,
 				D0C9FA70221113A500C91BF4 /* blackDice.png in Resources */,
 				D0C9FA6A221112F200C91BF4 /* dice4.png in Resources */,
 				D0C9FA6C221112F200C91BF4 /* dice2.png in Resources */,
 				D0C9FA69221112F200C91BF4 /* dice5.png in Resources */,
+				D0A6C09D222F89FC00F87645 /* minus@3x.png in Resources */,
 				D01A46592210651300ECE267 /* LaunchScreen.storyboard in Resources */,
+				D0A6C09F222F8AD400F87645 /* refresh@3x.png in Resources */,
 				D01A46562210651300ECE267 /* Assets.xcassets in Resources */,
+				D0756A6122202677004EFD6E /* whiteCheck.png in Resources */,
+				D0756A5F22202410004EFD6E /* brain.png in Resources */,
 				D0C9FA6E2211137700C91BF4 /* dice6.png in Resources */,
+				D0A6C0A3222F953A00F87645 /* password@3x.png in Resources */,
 				D01A46512210650C00ECE267 /* Main.storyboard in Resources */,
+				D0A6C097222F7C4000F87645 /* help@3x.png in Resources */,
+				D0A6C0A5222F97E800F87645 /* ok@3x.png in Resources */,
 				D0C9FA72221113F500C91BF4 /* clear.png in Resources */,
+				D0A6C09B222F89EF00F87645 /* plus@3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

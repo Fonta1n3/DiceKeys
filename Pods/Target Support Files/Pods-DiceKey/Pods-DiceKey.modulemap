@@ -1,0 +1,6 @@
+module Pods_DiceKey {
+  umbrella header "Pods-DiceKey-umbrella.h"
+
+  export *
+  module * { export * }
+}

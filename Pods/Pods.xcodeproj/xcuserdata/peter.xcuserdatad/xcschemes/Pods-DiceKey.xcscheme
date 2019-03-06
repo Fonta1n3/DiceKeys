@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DFC5063A2BDE1F41BFD721E7A4DF92C4"
+               BlueprintIdentifier = "847B403CE22455B78889B7F8035065A8"
                BlueprintName = "Pods-DiceKey"
                ReferencedContainer = "container:Pods.xcodeproj"
                BuildableName = "libPods-DiceKey.a">
