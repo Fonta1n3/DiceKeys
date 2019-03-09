@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		7D59917FC937D5922C985C8F /* libPods-DiceKey.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42CB43FFC4809E31022BC569 /* libPods-DiceKey.a */; };
+		D00971242230D3EA0094128A /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00971232230D3EA0094128A /* File.swift */; };
 		D01A464C2210650C00ECE267 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01A464B2210650C00ECE267 /* AppDelegate.swift */; };
 		D01A46512210650C00ECE267 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D01A464F2210650C00ECE267 /* Main.storyboard */; };
 		D01A46542210650C00ECE267 /* DiceKey.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D01A46522210650C00ECE267 /* DiceKey.xcdatamodeld */; };
@@ -17,6 +18,10 @@
 		D01A466922106FC900ECE267 /* BigInt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D01A466822106FC900ECE267 /* BigInt.framework */; };
 		D01A466B22106FCF00ECE267 /* SipHash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D01A466A22106FCF00ECE267 /* SipHash.framework */; };
 		D020B19D2217F7F50082B157 /* keyCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D020B19C2217F7F50082B157 /* keyCreator.swift */; };
+		D06ADA702232995D0045CF27 /* BitcoinCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06ADA6F2232995D0045CF27 /* BitcoinCore.swift */; };
+		D06ADA7222329D670045CF27 /* bitcoinCore.png in Resources */ = {isa = PBXBuildFile; fileRef = D06ADA7122329D670045CF27 /* bitcoinCore.png */; };
+		D06ADA78223372D60045CF27 /* QRScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06ADA77223372D60045CF27 /* QRScannerViewController.swift */; };
+		D06ADA7C22339AA10045CF27 /* Words.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06ADA7B22339AA10045CF27 /* Words.swift */; };
 		D0756A5F22202410004EFD6E /* brain.png in Resources */ = {isa = PBXBuildFile; fileRef = D0756A5E22202410004EFD6E /* brain.png */; };
 		D0756A6122202677004EFD6E /* whiteCheck.png in Resources */ = {isa = PBXBuildFile; fileRef = D0756A6022202677004EFD6E /* whiteCheck.png */; };
 		D094D0712211AB760042611E /* DiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D094D0702211AB760042611E /* DiceViewController.swift */; };
@@ -41,6 +46,7 @@
 /* Begin PBXFileReference section */
 		42CB43FFC4809E31022BC569 /* libPods-DiceKey.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DiceKey.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C71F455D509C637B31195DEE /* Pods-DiceKey.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DiceKey.release.xcconfig"; path = "Pods/Target Support Files/Pods-DiceKey/Pods-DiceKey.release.xcconfig"; sourceTree = "<group>"; };
+		D00971232230D3EA0094128A /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		D01A46482210650C00ECE267 /* DiceKey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DiceKey.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D01A464B2210650C00ECE267 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D01A46502210650C00ECE267 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -53,6 +59,10 @@
 		D01A466822106FC900ECE267 /* BigInt.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BigInt.framework; path = Carthage/Build/iOS/BigInt.framework; sourceTree = "<group>"; };
 		D01A466A22106FCF00ECE267 /* SipHash.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SipHash.framework; path = Carthage/Build/iOS/SipHash.framework; sourceTree = "<group>"; };
 		D020B19C2217F7F50082B157 /* keyCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = keyCreator.swift; sourceTree = "<group>"; };
+		D06ADA6F2232995D0045CF27 /* BitcoinCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinCore.swift; sourceTree = "<group>"; };
+		D06ADA7122329D670045CF27 /* bitcoinCore.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bitcoinCore.png; sourceTree = "<group>"; };
+		D06ADA77223372D60045CF27 /* QRScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerViewController.swift; sourceTree = "<group>"; };
+		D06ADA7B22339AA10045CF27 /* Words.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Words.swift; sourceTree = "<group>"; };
 		D0756A5E22202410004EFD6E /* brain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brain.png; sourceTree = "<group>"; };
 		D0756A6022202677004EFD6E /* whiteCheck.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteCheck.png; sourceTree = "<group>"; };
 		D094D0702211AB760042611E /* DiceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiceViewController.swift; sourceTree = "<group>"; };
@@ -120,14 +130,19 @@
 		D01A464A2210650C00ECE267 /* DiceKey */ = {
 			isa = PBXGroup;
 			children = (
+				D06ADA7B22339AA10045CF27 /* Words.swift */,
+				D06ADA6F2232995D0045CF27 /* BitcoinCore.swift */,
+				D00971232230D3EA0094128A /* File.swift */,
 				D0C9FA62221112CD00C91BF4 /* Image Files */,
 				D01A464B2210650C00ECE267 /* AppDelegate.swift */,
 				D0C9FA6022110FFC00C91BF4 /* diceCreator.swift */,
 				D01A464F2210650C00ECE267 /* Main.storyboard */,
 				D01A46552210651300ECE267 /* Assets.xcassets */,
+				D06ADA77223372D60045CF27 /* QRScannerViewController.swift */,
 				D01A46572210651300ECE267 /* LaunchScreen.storyboard */,
 				D094D0702211AB760042611E /* DiceViewController.swift */,
 				D0A6C0A0222F921000F87645 /* cancel@3x.png */,
+				D06ADA7122329D670045CF27 /* bitcoinCore.png */,
 				D0756A6022202677004EFD6E /* whiteCheck.png */,
 				D0A6C096222F7C4000F87645 /* help@3x.png */,
 				D0A6C09A222F89EF00F87645 /* plus@3x.png */,
@@ -239,6 +254,7 @@
 				D0C9FA69221112F200C91BF4 /* dice5.png in Resources */,
 				D0A6C09D222F89FC00F87645 /* minus@3x.png in Resources */,
 				D01A46592210651300ECE267 /* LaunchScreen.storyboard in Resources */,
+				D06ADA7222329D670045CF27 /* bitcoinCore.png in Resources */,
 				D0A6C09F222F8AD400F87645 /* refresh@3x.png in Resources */,
 				D01A46562210651300ECE267 /* Assets.xcassets in Resources */,
 				D0756A6122202677004EFD6E /* whiteCheck.png in Resources */,
@@ -302,10 +318,14 @@
 			files = (
 				D0C9FA6122110FFC00C91BF4 /* diceCreator.swift in Sources */,
 				D094D0712211AB760042611E /* DiceViewController.swift in Sources */,
+				D00971242230D3EA0094128A /* File.swift in Sources */,
 				D020B19D2217F7F50082B157 /* keyCreator.swift in Sources */,
 				D01A46632210675C00ECE267 /* ObjectiveCHeader.m in Sources */,
+				D06ADA78223372D60045CF27 /* QRScannerViewController.swift in Sources */,
+				D06ADA702232995D0045CF27 /* BitcoinCore.swift in Sources */,
 				D01A46542210650C00ECE267 /* DiceKey.xcdatamodeld in Sources */,
 				D01A464C2210650C00ECE267 /* AppDelegate.swift in Sources */,
+				D06ADA7C22339AA10045CF27 /* Words.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -453,8 +473,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 69FR345CDA;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -473,7 +493,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.fontaine.DiceKeys;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = DiceKeys;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "DiceKey/DiceKey-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
@@ -487,8 +507,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 69FR345CDA;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -508,7 +528,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.fontaine.DiceKeys;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = DiceKeys;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "DiceKey/DiceKey-Bridging-Header.h";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";

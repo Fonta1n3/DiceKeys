@@ -17,15 +17,17 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.5</string>
+	<string>1.7</string>
 	<key>CFBundleVersion</key>
-	<string>6</string>
+	<string>8</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>This app does not use the camera.</string>
+	<string>So we can scan a QR Code</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>So we can save a QR Code to your image library</string>
+	<string>So we can save a QR Code to your photo library</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>So we can upload a QR Code from your photo library</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
