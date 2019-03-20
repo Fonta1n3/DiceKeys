@@ -8,15 +8,15 @@
 
 import UIKit
 import BigInt
-import AVFoundation
-import SystemConfiguration
 import EFQRCode
 
-class DiceViewController: UIViewController, UITabBarControllerDelegate {
+class DiceViewController: UIViewController {
     
+    var brainWallet = Bool()
+    var normalWallet = Bool()
+    var diceWallet = Bool()
     @IBOutlet weak var scrollView: UIScrollView!
     var keyDict = [[String:String]]()
-    var password = ""
     var whatsThisTitle = "BIP39 Mnemonic"
     var whatsThisMessage = "\"A seed phrase, seed recovery phrase or backup seed phrase is a list of words which store all the information needed to recover a Bitcoin wallet. Wallet software will typically generate a seed phrase and instruct the user to write it down on paper. If the user's computer breaks or their hard drive becomes corrupted, they can download the same wallet software again and use the paper backup to get their bitcoins back.\" Source: https://en.bitcoin.it/wiki/Seed_phrase\n\nThis recovery phrase is used to create a keychain that allows you to create an infinite amount of deterministic private keys and addresses known as child keys. The derivitaion scheme DiceKey uses is BIP44 which is the industry standard, for more info visit https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki\n\nThe deriviation path we use is m/44'/0'/0'/0"
     let infoButton = UIButton()
@@ -29,7 +29,6 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
     var mnemonicView: UITextView!
     var button = UIButton(type: .custom)
     var nextButton = UIButton(type: .custom)
-    var diceButton = UIButton()
     var parseBitResult = BigInt()
     var words = String()
     var mnemonicLabel = UILabel()
@@ -47,26 +46,15 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
     let minusButton = UIButton()
     var index = 0
     let brainButton = UIButton()
-    let bitcoinCoreButton = UIButton()
     let indexLabel = UILabel()
+    var password = String()
+    let backButton = UIButton()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         print("ViewController viewDidLoad")
         
-        tabBarController!.delegate = self
-        showDice()
-        percentageLabel.frame = CGRect(x: view.frame.maxX / 2 - 20, y: 50, width: 40, height: 40)
-        percentageLabel.textColor = UIColor.black
-        percentageLabel.backgroundColor = UIColor.white
-        percentageLabel.layer.cornerRadius = 20
-        percentageLabel.alpha = 0
-        percentageLabel.text = "0%"
-        percentageLabel.adjustsFontSizeToFitWidth = true
-        percentageLabel.clipsToBounds = true
-        addShadow(view: percentageLabel)
-        percentageLabel.font = UIFont.init(name: "HelveticaNeue-Light", size: 15)
-        percentageLabel.textAlignment = .center
+        addBackButton()
         
     }
     
@@ -100,8 +88,32 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
         
     }
     
+    func addBackButton() {
+        
+        button.removeFromSuperview()
+        button.frame = CGRect(x: 10, y: 24, width: 30, height: 30)
+        button.showsTouchWhenHighlighted = true
+        button.setImage(UIImage(named: "cancel@3x.png"), for: .normal)
+        button.backgroundColor = UIColor.white
+        button.layer.cornerRadius = 15
+        addShadow(view: button)
+        button.addTarget(self, action: #selector(home), for: .touchUpInside)
+        view.addSubview(button)
+        
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         print("viewdidappear")
+        
+        if UserDefaults.standard.object(forKey: "bip39Password") != nil {
+            
+            password = UserDefaults.standard.object(forKey: "bip39Password") as! String
+            
+        } else {
+            
+            password = ""
+            
+        }
         
         let importedRecoveryPhrase = Library.sharedInstance.words
         let importedXpub = Library.sharedInstance.xpub
@@ -126,12 +138,11 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
             if success {
                 
                 self.words = self.seedDict["recoveryPhrase"] as! String
-                self.button.removeFromSuperview()
                 self.showRecoveryPhraseAndQRCode()
                 
             } else {
                 
-                self.displayAlert(viewController: self, title: "Error", message: "We apologize, that really shouldn't have happened... Please email us at BitSenseApp@gmail.com and let us know what happened so we can fix it.")
+                displayAlert(viewController: self, title: "Error", message: "We apologize, that really shouldn't have happened... Please email us at BitSenseApp@gmail.com and let us know what happened so we can fix it.")
             }
             
         } else if importedXpub != "" {
@@ -141,7 +152,9 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
             self.removeHomeScreenButtons()
             
             for dice in self.diceArray {
+                
                 dice.removeFromSuperview()
+                
             }
             self.diceArray.removeAll()
             self.tappedIndex = 0
@@ -152,13 +165,13 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
             
             if success {
                 
-                self.words = self.seedDict["recoveryPhrase"] as! String
-                self.button.removeFromSuperview()
+                self.words = ""
                 self.showRecoveryPhraseAndQRCode()
+                displayAlert(viewController: self, title: "Attention", message: "For now DiceKeys only supports BIP44 format for importing XPUBs, regardless of your settings the following keys will be BIP44 compatible with derivation path \"m/44'/0'/0'/0")
                 
             } else {
                 
-                self.displayAlert(viewController: self, title: "Error", message: "We apologize, that really shouldn't have happened... Please email us at BitSenseApp@gmail.com and let us know what happened so we can fix it.")
+                displayAlert(viewController: self, title: "Error", message: "We apologize, that really shouldn't have happened... Please email us at BitSenseApp@gmail.com and let us know what happened so we can fix it.")
             }
             
         } else if importedXprv != "" {
@@ -180,108 +193,30 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
             if success {
                 
                 self.words = self.seedDict["recoveryPhrase"] as! String
-                self.button.removeFromSuperview()
                 self.showRecoveryPhraseAndQRCode()
                 
             } else {
                 
-                self.displayAlert(viewController: self, title: "Error", message: "We apologize, that really shouldn't have happened... Please email us at BitSenseApp@gmail.com and let us know what happened so we can fix it.")
+                displayAlert(viewController: self, title: "Error", message: "We apologize, that really shouldn't have happened... Please email us at BitSenseApp@gmail.com and let us know what happened so we can fix it.")
             }
             
         }
         
-    }
-    
-    func addGetNowButton() {
-        
-        DispatchQueue.main.async {
+        if diceWallet {
             
-            self.getNowButton.removeFromSuperview()
-            self.getNowButton.frame = CGRect(x: 5, y: 20, width: 30, height: 30)
-            self.getNowButton.showsTouchWhenHighlighted = true
-            self.getNowButton.setImage(UIImage(named: "ok@3x.png"), for: .normal)
-            self.getNowButton.backgroundColor = UIColor.clear
-            self.getNowButton.addTarget(self, action: #selector(self.getKeysNow), for: .touchUpInside)
-            self.view.addSubview(self.getNowButton)
-            
-            self.passwordButton.removeFromSuperview()
-            self.passwordButton.frame = CGRect(x: (self.view.frame.maxX / 3.75) - 15, y: 20, width: 30, height: 30)
-            self.passwordButton.setImage(UIImage(named: "password@3x.png"), for: .normal)
-            self.passwordButton.backgroundColor = UIColor.clear
-            self.passwordButton.addTarget(self, action: #selector(self.setBIP39Password), for: .touchUpInside)
-            self.view.addSubview(self.passwordButton)
-            
-            self.brainButton.removeFromSuperview()
-            self.brainButton.frame = CGRect(x: (self.view.frame.maxX / 1.35) - 17.5, y: 18, width: 35, height: 35)
-            self.brainButton.setImage(UIImage(named: "brain.png"), for: .normal)
-            self.brainButton.backgroundColor = UIColor.clear
-            self.brainButton.addTarget(self, action: #selector(self.getBrainWalletNow), for: .touchUpInside)
-            self.view.addSubview(self.brainButton)
-            
-            self.bitcoinCoreButton.removeFromSuperview()
-            self.bitcoinCoreButton.frame = CGRect(x: (self.view.frame.maxX / 2) - 15, y: 20, width: 30, height: 30)
-            self.bitcoinCoreButton.setImage(UIImage(named: "bitcoinCore.png"), for: .normal)
-            self.bitcoinCoreButton.backgroundColor = UIColor.clear
-            self.bitcoinCoreButton.addTarget(self, action: #selector(self.getBitcoinCoreKey), for: .touchUpInside)
-            self.view.addSubview(self.bitcoinCoreButton)
+            showDice()
             
         }
         
-   }
-    
-    @objc func getBitcoinCoreKey() {
+        if normalWallet {
+            
+            getKeysNow()
+            
+        }
         
-        if !isInternetAvailable() {
+        if brainWallet {
             
-            DispatchQueue.main.async {
-                
-                let alert = UIAlertController(title: "Attention!", message: "By tapping this button we will use any dice rolls you have made in conjunction with Apples cryptographically secure random number generator to create your keys. These keys are compatible with Bitcoin Core wallets. Using BIP32 derivation path m/0'/0' (keys are not hardened).", preferredStyle: UIAlertController.Style.actionSheet)
-                
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Get Keys Now", comment: ""), style: .default, handler: { (action) in
-                    
-                    self.removeHomeScreenButtons()
-                    
-                    for dice in self.diceArray {
-                        dice.removeFromSuperview()
-                    }
-                    self.diceArray.removeAll()
-                    self.tappedIndex = 0
-                    
-                    let dict = createBitcoinCoreKeyChain(viewController: self, password: self.password, diceRolls: self.joinedBits)
-                    let success = dict["success"] as! Bool
-                    self.seedDict = dict["seedDict"] as! [String:String]
-                    self.keyDict = dict["keyArray"] as! [[String:String]]
-                    
-                    if success {
-                        
-                        self.words = self.seedDict["recoveryPhrase"] as! String
-                        self.button.removeFromSuperview()
-                        self.showRecoveryPhraseAndQRCode()
-                        
-                    } else {
-                        
-                        self.displayAlert(viewController: self, title: "Error", message: "We apologize, that really shouldn't have happened... Please email us at BitSenseApp@gmail.com and let us know what happened so we can fix it.")
-                    }
-                    
-                }))
-                
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: { (action) in }))
-                
-                alert.popoverPresentationController?.sourceView = self.view
-                self.present(alert, animated: true) {
-                    print("option menu presented")
-                    
-                }
-                
-            }
-            
-        } else {
-            
-            DispatchQueue.main.async {
-                
-                self.displayAlert(viewController: self, title: "Turn on airplane mode and wifi off to create private keys securely.", message: "The idea is to never let your Bitcoin private key touch the internet, secure keys are worth the effort.")
-                
-            }
+            getBrainWalletNow()
             
         }
         
@@ -291,11 +226,8 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
         
         DispatchQueue.main.async {
             
-            self.brainButton.removeFromSuperview()
-            self.passwordButton.removeFromSuperview()
             self.getNowButton.removeFromSuperview()
             self.clearButton.removeFromSuperview()
-            self.bitcoinCoreButton.removeFromSuperview()
             self.percentageLabel.removeFromSuperview()
             
         }
@@ -362,6 +294,7 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
     }
     
     @objc func minusFromIndex() {
+        print("minusFromIndex")
         
         if self.index > 0 {
             
@@ -450,41 +383,19 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
             
             DispatchQueue.main.async {
                 
-                let alert = UIAlertController(title: "Attention!", message: "By tapping this button we will create a brain wallet for you, the recovery phrase will be only 12 words so you can memorize it easily. For the brain wallet no dice rolls are needed. These wallets are BIP44 compatible with derivation path m/44'/0'/0'/0", preferredStyle: UIAlertController.Style.actionSheet)
+                let dict = createBrainWallet(viewController: self, password: self.password, diceRolls: self.joinedBits)
+                let success = dict["success"] as! Bool
+                self.seedDict = dict["seedDict"] as! [String:String]
+                self.keyDict = dict["keyArray"] as! [[String:String]]
                 
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Get Brain Wallet", comment: ""), style: .default, handler: { (action) in
+                if success {
                     
-                    self.removeHomeScreenButtons()
+                    self.words = self.seedDict["recoveryPhrase"] as! String
+                    self.showRecoveryPhraseAndQRCode()
                     
-                    for dice in self.diceArray {
-                        dice.removeFromSuperview()
-                    }
-                    self.diceArray.removeAll()
-                    self.tappedIndex = 0
+                } else {
                     
-                    let dict = createBrainWallet(viewController: self, password: self.password, diceRolls: self.joinedBits)
-                    let success = dict["success"] as! Bool
-                    self.seedDict = dict["seedDict"] as! [String:String]
-                    self.keyDict = dict["keyArray"] as! [[String:String]]
-                    
-                    if success {
-                        
-                        self.words = self.seedDict["recoveryPhrase"] as! String
-                        self.button.removeFromSuperview()
-                        self.showRecoveryPhraseAndQRCode()
-                        
-                    } else {
-                        
-                        self.displayAlert(viewController: self, title: "Error", message: "We apologize, that really shouldn't have happened... Please email us at BitSenseApp@gmail.com and let us know what happened so we can fix it.")
-                    }
-                    
-                }))
-                
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: { (action) in }))
-                
-                alert.popoverPresentationController?.sourceView = self.view
-                self.present(alert, animated: true) {
-                    print("option menu presented")
+                    displayAlert(viewController: self, title: "Error", message: "We apologize, that really shouldn't have happened... Please email us at BitSenseApp@gmail.com and let us know what happened so we can fix it.")
                 }
                 
             }
@@ -493,13 +404,11 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
             
             DispatchQueue.main.async {
                 
-                self.displayAlert(viewController: self, title: "Turn on airplane mode and wifi off to create private keys securely.", message: "The idea is to never let your Bitcoin private key touch the internet, secure keys are worth the effort.")
+                displayAlert(viewController: self, title: "Turn on airplane mode and turn wifi off to create private keys securely.", message: "The idea is to never let your Bitcoin private key touch the internet, secure keys are worth the effort.")
                 
             }
             
         }
-        
-        
         
     }
     
@@ -509,44 +418,65 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
             
             DispatchQueue.main.async {
                 
-                let alert = UIAlertController(title: "Attention!", message: "By tapping this button we will use any dice rolls you have made in conjunction with Apples cryptographically secure random number generator to create your keys. If you would only like to use your dice rolls then keep rolling more and DiceKeys will automatically generate the keys when you have rolled 256 bits worth of dice. These wallets are BIP44 compatible with derivation path m/44'/0'/0'/0", preferredStyle: UIAlertController.Style.actionSheet)
-                
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Get Keys Now", comment: ""), style: .default, handler: { (action) in
+                if self.diceWallet {
                     
-                    self.removeHomeScreenButtons()
+                    let alert = UIAlertController(title: "Attention!", message: "By tapping this button we will use any dice rolls you have made in conjunction with Apples cryptographically secure random number generator to create your keys. If you would only like to use your dice rolls then keep rolling more and DiceKeys will automatically generate the keys when you have rolled 256 bits worth of dice.", preferredStyle: UIAlertController.Style.actionSheet)
                     
-                    for dice in self.diceArray {
-                        dice.removeFromSuperview()
+                    alert.addAction(UIAlertAction(title: NSLocalizedString("Get Keys Now", comment: ""), style: .default, handler: { (action) in
+                        
+                        self.removeHomeScreenButtons()
+                        
+                        for dice in self.diceArray {
+                            dice.removeFromSuperview()
+                        }
+                        self.diceArray.removeAll()
+                        self.tappedIndex = 0
+                        
+                        let dict = createKeyChain(viewController: self, password: self.password, diceRolls: self.joinedBits)
+                        let success = dict["success"] as! Bool
+                        self.seedDict = dict["seedDict"] as! [String:String]
+                        self.keyDict = dict["keyArray"] as! [[String:String]]
+                        
+                        if success {
+                            
+                            self.words = self.seedDict["recoveryPhrase"] as! String
+                            self.showRecoveryPhraseAndQRCode()
+                            
+                        } else {
+                            
+                            displayAlert(viewController: self, title: "Error", message: "We apologize, that really shouldn't have happened... Please email us at BitSenseApp@gmail.com and let us know what happened so we can fix it.")
+                            
+                        }
+                        
+                    }))
+                    
+                    alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: { (action) in }))
+                    
+                    alert.popoverPresentationController?.sourceView = self.view
+                    
+                    self.present(alert, animated: true) {
+                        
+                        print("option menu presented")
+                        
                     }
-                    self.diceArray.removeAll()
-                    self.tappedIndex = 0
+                    
+                } else {
                     
                     let dict = createKeyChain(viewController: self, password: self.password, diceRolls: self.joinedBits)
                     let success = dict["success"] as! Bool
                     self.seedDict = dict["seedDict"] as! [String:String]
                     self.keyDict = dict["keyArray"] as! [[String:String]]
-                        
+                    
                     if success {
-                            
+                        
                         self.words = self.seedDict["recoveryPhrase"] as! String
-                        self.button.removeFromSuperview()
                         self.showRecoveryPhraseAndQRCode()
-                            
+                        
                     } else {
-                            
-                        self.displayAlert(viewController: self, title: "Error", message: "We apologize, that really shouldn't have happened... Please email us at BitSenseApp@gmail.com and let us know what happened so we can fix it.")
+                        
+                        displayAlert(viewController: self, title: "Error", message: "We apologize, that really shouldn't have happened... Please email us at BitSenseApp@gmail.com and let us know what happened so we can fix it.")
                         
                     }
-                        
-                }))
-                
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: { (action) in }))
-                
-                alert.popoverPresentationController?.sourceView = self.view
-                
-                self.present(alert, animated: true) {
-                    
-                    print("option menu presented")
                     
                 }
                 
@@ -556,7 +486,7 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
             
             DispatchQueue.main.async {
                 
-                self.displayAlert(viewController: self, title: "Turn on airplane mode and wifi off to create private keys securely.", message: "The idea is to never let your Bitcoin private key touch the internet, secure keys are worth the effort.")
+                displayAlert(viewController: self, title: "Turn on airplane mode and turn wifi off to create private keys securely.", message: "The idea is to never let your Bitcoin private key touch the internet, secure keys are worth the effort.")
                 
             }
             
@@ -608,41 +538,6 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
     
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask { return UIInterfaceOrientationMask.portrait }
     
-    func displayAlert(viewController: UIViewController, title: String, message: String) {
-        print("displayAlert")
-        
-        let alertcontroller = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alertcontroller.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default, handler: nil))
-        viewController.present(alertcontroller, animated: true, completion: nil)
-        
-    }
-    
-    func isInternetAvailable() -> Bool {
-        print("isInternetAvailable")
-        
-        var zeroAddress = sockaddr_in()
-        zeroAddress.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
-        zeroAddress.sin_family = sa_family_t(AF_INET)
-        
-        guard let defaultRouteReachability = withUnsafePointer(to: &zeroAddress, {
-            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
-                SCNetworkReachabilityCreateWithAddress(nil, $0)
-            }
-        }) else {
-            return false
-        }
-        
-        var flags: SCNetworkReachabilityFlags = []
-        if !SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) {
-            return false
-        }
-        
-        let isReachable = flags.contains(.reachable)
-        let needsConnection = flags.contains(.connectionRequired)
-        return (isReachable && !needsConnection)
-        
-    }
-    
     @objc func home() {
         print("home")
         
@@ -664,15 +559,13 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
                     self.percentageLabel.text = "0%"
                     self.mnemonicLabel.text = ""
                     self.password = ""
-                    self.recoveryPhraseQRView.image = nil
                     self.nextIndex = 0
                     self.myField.text = ""
                     self.infoButton.removeFromSuperview()
                     self.percentageLabel.text = ""
                     self.myField.removeFromSuperview()
                     self.nextButton.removeFromSuperview()
-                    self.button.removeFromSuperview()
-                    self.showDice()
+                    self.dismiss(animated: true, completion: nil)
                     
                 }
                 
@@ -722,16 +615,6 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
             mnemonicLabel.text = "Recovery phrase:"
             
         }
-        
-        button.removeFromSuperview()
-        button.frame = CGRect(x: 10, y: 24, width: 30, height: 30)
-        button.showsTouchWhenHighlighted = true
-        button.setImage(UIImage(named: "cancel@3x.png"), for: .normal)
-        button.backgroundColor = UIColor.white
-        button.layer.cornerRadius = 15
-        addShadow(view: button)
-        button.addTarget(self, action: #selector(home), for: .touchUpInside)
-        view.addSubview(button)
         
         recoveryPhraseQRView = UIImageView(image: recoveryPhraseImage!)
         recoveryPhraseQRView.frame = CGRect(x: view.center.x - ((view.frame.width - 70) / 2), y: view.center.y / 3, width: view.frame.width - 70, height: view.frame.width - 70)
@@ -820,7 +703,8 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
         print("addNextButton")
         
         DispatchQueue.main.async {
-            self.nextButton = UIButton(frame: CGRect(x: self.view.center.x - 15, y: self.view.frame.maxY - 90, width: 30, height: 30))
+            
+            self.nextButton = UIButton(frame: CGRect(x: self.view.center.x - 15, y: self.view.frame.maxY - 50, width: 30, height: 30))
             self.nextButton.showsTouchWhenHighlighted = true
             self.nextButton.setImage(UIImage(named: "refresh@3x.png"), for: .normal)
             self.nextButton.backgroundColor = UIColor.white
@@ -828,6 +712,7 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
             self.addShadow(view: self.nextButton)
             self.nextButton.addTarget(self, action: #selector(self.showNext), for: .touchUpInside)
             self.view.addSubview(self.nextButton)
+            
         }
         
     }
@@ -1087,12 +972,11 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
                             if success {
                                 
                                 self.words = self.seedDict["recoveryPhrase"] as! String
-                                self.button.removeFromSuperview()
                                 self.showRecoveryPhraseAndQRCode()
                                 
                             } else {
                                 
-                                self.displayAlert(viewController: self, title: "Error", message: "We apologize, that really shouldn't have happened... Please email us at BitSenseApp@gmail.com and let us know what happened so we can fix it.")
+                                displayAlert(viewController: self, title: "Error", message: "We apologize, that really shouldn't have happened... Please email us at BitSenseApp@gmail.com and let us know what happened so we can fix it.")
                                 
                             }
                             
@@ -1112,9 +996,12 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
     
     @objc func tapDice(sender: UIButton!) {
         
+        
+        
         percentageLabel.alpha = 1
         
         let diceNumber = Int((sender.titleLabel?.text)!)!
+        print("sender.tag = \(sender.tag)")
         sender.titleLabel?.textColor = UIColor.clear
         sender.titleLabel?.backgroundColor = UIColor.clear
         sender.titleLabel?.alpha = 0
@@ -1195,7 +1082,7 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
                 
                     alert.addAction(UIAlertAction(title: NSLocalizedString("Why?", comment: ""), style: .default, handler: { (action) in
                     
-                        self.displayAlert(viewController: self, title: "", message: "We make it impossible for you to input the dice values out of order becasue we don't want you to accidentally create a Private Key that is not based on cryptographic secure randomness. We also do this to make it impossible for you to accidentally tap and change a value of a dice you have already input. Secure keys are worth the effort!")
+                        displayAlert(viewController: self, title: "", message: "We make it impossible for you to input the dice values out of order becasue we don't want you to accidentally create a Private Key that is not based on cryptographic secure randomness. We also do this to make it impossible for you to accidentally tap and change a value of a dice you have already input. Secure keys are worth the effort!")
                     
                     }))
                 
@@ -1209,7 +1096,7 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
          
             DispatchQueue.main.async {
             
-                self.displayAlert(viewController: self, title: "Turn on airplane mode and wifi off to create private keys securely.", message: "The idea is to never let your Bitcoin private key touch the internet, secure keys are worth the effort.")
+                displayAlert(viewController: self, title: "Turn on airplane mode and turn wifi off to create private keys securely.", message: "The idea is to never let your Bitcoin private key touch the internet, secure keys are worth the effort.")
             
             }
             
@@ -1220,7 +1107,26 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
     func showDice() {
         print("showDice")
         
-        addGetNowButton()
+        getNowButton.removeFromSuperview()
+        getNowButton.frame = CGRect(x: view.frame.midX - 15, y: 20, width: 30, height: 30)
+        getNowButton.showsTouchWhenHighlighted = true
+        getNowButton.setImage(UIImage(named: "ok@3x.png"), for: .normal)
+        getNowButton.backgroundColor = UIColor.clear
+        getNowButton.addTarget(self, action: #selector(getKeysNow), for: .touchUpInside)
+        view.addSubview(getNowButton)
+        
+        percentageLabel.frame = CGRect(x: view.frame.maxX / 2 - 20, y: 50, width: 40, height: 40)
+        percentageLabel.textColor = UIColor.black
+        percentageLabel.backgroundColor = UIColor.white
+        percentageLabel.layer.cornerRadius = 20
+        percentageLabel.alpha = 0
+        percentageLabel.text = "0%"
+        percentageLabel.adjustsFontSizeToFitWidth = true
+        percentageLabel.clipsToBounds = true
+        addShadow(view: percentageLabel)
+        percentageLabel.font = UIFont.init(name: "HelveticaNeue-Light", size: 15)
+        percentageLabel.textAlignment = .center
+        
         addClearButton()
         var xvalue:Int!
         let screenWidth = self.view.frame.width
@@ -1228,96 +1134,76 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
         let height = width
         let xSpacing = width / 6
         xvalue = xSpacing
-        var yvalue = 80
+        var yvalue = 0
         var zero = 0
         view.addSubview(scrollView)
         
-        for _ in 0..<40 {
-            for _ in 0..<5 {
-                zero = zero + 1
-                self.diceButton = UIButton(frame: CGRect(x: xvalue, y: yvalue, width: width, height: height))
-                self.diceButton.setImage(#imageLiteral(resourceName: "blackDice.png"), for: .normal)
-                self.diceButton.tag = zero
-                self.diceButton.showsTouchWhenHighlighted = true
-                self.diceButton.backgroundColor = .clear
-                self.diceButton.setTitle("\(0)", for: .normal)
-                self.diceButton.titleLabel?.alpha = 0
-                self.diceButton.addTarget(self, action: #selector(self.tapDice), for: .touchUpInside)
-                self.diceArray.append(self.diceButton)
-                self.scrollView.addSubview(self.diceButton)
-                xvalue = xvalue + width + xSpacing
-            }
-            xvalue = xSpacing
-            if screenWidth < 1000 {
-                yvalue = yvalue + 90
-            } else {
-                yvalue = yvalue + 180
-            }
+        let dispatchGroup = DispatchGroup()
+        dispatchGroup.enter()
+        
+        for _ in 0..<200 {
             
+            zero = zero + 1
+            let diceButton = UIButton()
+            diceButton.frame = CGRect(x: width / 6, y: 80, width: width, height: height)
+            diceButton.setImage(#imageLiteral(resourceName: "blackDice.png"), for: .normal)
+            diceButton.tag = zero
+            diceButton.showsTouchWhenHighlighted = true
+            diceButton.backgroundColor = .clear
+            diceButton.setTitle("\(0)", for: .normal)
+            diceButton.titleLabel?.alpha = 0
+            diceButton.addTarget(self, action: #selector(self.tapDice), for: .touchUpInside)
+            self.diceArray.append(diceButton)
+            self.scrollView.addSubview(diceButton)
+            print("zero = \(zero)")
+            if zero == 200 {
+                dispatchGroup.leave()
+            }
         }
         
-    }
-    
-    @objc func setBIP39Password() {
+        var index = 0
         
-        DispatchQueue.main.async {
-            var firstPassword = String()
-            var secondPassword = String()
+        dispatchGroup.notify(queue: .main) {
             
-            let alert = UIAlertController(title: "Dual Factor Password", message: "You have the option to create a BIP39 dual factor password to encrypt your recovery phrase. Only create a password if you are absolutely certain you will remember it. If you are worried you won't remember it just tap cancel and we will create your recovery phrase without a password.\n\nWE DO NOT SAVE THE PASSWORD, once your recovery phrase is created the device WILL ERASE ALL DATA, there is no lost password button. We suggest writing the password down and saving it in multiple locations.", preferredStyle: .alert)
-            
-            alert.addTextField { (textField1) in
+            for _ in 0..<40 {
                 
-                textField1.placeholder = "Add Password"
-                textField1.isSecureTextEntry = true
-                
-            }
-            
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Add", comment: ""), style: .destructive, handler: { (action) in
-                
-                firstPassword = alert.textFields![0].text!
-                
-                let confirmationAlert = UIAlertController(title: "Confirm Password", message: "Please input your password again to make sure there were no typos.", preferredStyle: .alert)
-                
-                confirmationAlert.addTextField { (textField1) in
+                for _ in 0..<5 {
                     
-                    textField1.placeholder = "Confirm Password"
-                    textField1.isSecureTextEntry = true
+                    
+                    DispatchQueue.main.async {
+                        
+                        UIView.animate(withDuration: 1.0, animations: {
+                            
+                            if index % 5 == 0 {
+                                
+                                xvalue = xSpacing
+                                
+                                if screenWidth < 1000 {
+                                    
+                                    yvalue = yvalue + 90
+                                    
+                                } else {
+                                    
+                                    yvalue = yvalue + 180
+                                    
+                                }
+                                
+                                
+                            }
+                            
+                            self.diceArray[index].frame = CGRect(x: xvalue, y: yvalue, width: width, height: height)
+                            xvalue = xvalue + width + xSpacing
+                            
+                        })
+                        
+                        index = index + 1
+                            
+                    }
                     
                 }
                 
-                confirmationAlert.addAction(UIAlertAction(title: NSLocalizedString("Confirm", comment: ""), style: .destructive, handler: { (action) in
-                    
-                    secondPassword = confirmationAlert.textFields![0].text!
-                    
-                    if firstPassword == secondPassword {
-                        
-                        self.password = secondPassword
-                        self.displayAlert(viewController: self, title: "Success", message: "You have succesfully added a password that will be used to encrpyt the recovery you will now make by rolling dice and inputing the values into the app, please ensure you don't forget the password as you will need it along with your recovery phrase to recover your Bitcoin.")
-                        
-                    } else {
-                        
-                        self.displayAlert(viewController: self, title: "Error", message: "Passwords did not match please start over.")
-                        
-                    }
-                    
-                }))
-                
-                confirmationAlert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .default, handler: { (action) in
-                    
-                    
-                }))
-                
-                self.present(confirmationAlert, animated: true, completion: nil)
-                
-            }))
+            }
             
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .default, handler: { (action) in
-                
-                
-            }))
-            
-            self.present(alert, animated: true, completion: nil)
         }
         
     }
@@ -1356,9 +1242,6 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
                 
             })
             
-            
-            
-            
         }
         
     }
@@ -1396,68 +1279,4 @@ class DiceViewController: UIViewController, UITabBarControllerDelegate {
 
 }
 
-extension DiceViewController  {
-    
-    func tabBarController(_ tabBarController: UITabBarController, animationControllerForTransitionFrom fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        
-        return MyTransition(viewControllers: tabBarController.viewControllers)
-        
-    }
-    
-}
 
-class MyTransition: NSObject, UIViewControllerAnimatedTransitioning {
-    
-    let viewControllers: [UIViewController]?
-    let transitionDuration: Double = 0.5
-    
-    init(viewControllers: [UIViewController]?) {
-        self.viewControllers = viewControllers
-    }
-    
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return TimeInterval(transitionDuration)
-    }
-    
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        
-        guard
-            let fromVC = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from),
-            let fromView = fromVC.view,
-            let fromIndex = getIndex(forViewController: fromVC),
-            let toVC = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.to),
-            let toView = toVC.view,
-            let toIndex = getIndex(forViewController: toVC)
-            else {
-                transitionContext.completeTransition(false)
-                return
-        }
-        
-        let frame = transitionContext.initialFrame(for: fromVC)
-        var fromFrameEnd = frame
-        var toFrameStart = frame
-        fromFrameEnd.origin.x = toIndex > fromIndex ? frame.origin.x - frame.width : frame.origin.x + frame.width
-        toFrameStart.origin.x = toIndex > fromIndex ? frame.origin.x + frame.width : frame.origin.x - frame.width
-        toView.frame = toFrameStart
-        
-        DispatchQueue.main.async {
-            transitionContext.containerView.addSubview(toView)
-            UIView.animate(withDuration: self.transitionDuration, animations: {
-                fromView.frame = fromFrameEnd
-                toView.frame = frame
-            }, completion: {success in
-                fromView.removeFromSuperview()
-                transitionContext.completeTransition(success)
-            })
-        }
-    }
-    
-    func getIndex(forViewController vc: UIViewController) -> Int? {
-        guard let vcs = self.viewControllers else { return nil }
-        for (index, thisVC) in vcs.enumerated() {
-            if thisVC == vc { return index }
-        }
-        return nil
-    }
-    
-}

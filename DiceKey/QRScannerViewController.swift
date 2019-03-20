@@ -260,46 +260,58 @@ class QRScannerViewController: UIViewController, UITabBarControllerDelegate, AVC
     func importKeys(string: String) {
         print("importKeys = \(string)")
         
-        switch string.prefix(4) {
+        if !isInternetAvailable() {
             
-        case "xpub":
-            print("its an xpub")
-            
-            Library.sharedInstance.xpub = string
-            
-            DispatchQueue.main.async {
+            switch string.prefix(4) {
                 
-                self.tabBarController?.selectedIndex = 0
+            case "xpub":
+                print("its an xpub")
+                
+                Library.sharedInstance.xpub = string
+                
+                DispatchQueue.main.async {
+                    
+                    self.tabBarController?.selectedIndex = 0
+                    
+                }
+                
+            case "xprv":
+                print("its an xprv")
+                
+                Library.sharedInstance.xprv = string
+                
+                DispatchQueue.main.async {
+                    
+                    self.tabBarController?.selectedIndex = 0
+                    
+                }
+                
+            case "zpub":
+                print("its a zpub")
+                
+                displayAlert(viewController: self, title: "Error", message: "We do not yet support zpubs.")
+                
+            case "zprv":
+                print("its a zprv")
+                
+                displayAlert(viewController: self, title: "Error", message: "We do not yet support zprvs")
+                
+            default:
+                print("its a recovery phrase?")
+                
+                Library.sharedInstance.words = string
+                
+                DispatchQueue.main.async {
+                    
+                    self.tabBarController?.selectedIndex = 0
+                    
+                }
                 
             }
             
-        case "xprv":
-            print("its an xprv")
+        } else {
             
-            Library.sharedInstance.xprv = string
-            
-            DispatchQueue.main.async {
-                
-                self.tabBarController?.selectedIndex = 0
-                
-            }
-            
-        case "zpub":
-            print("its a zpub")
-            
-        case "zprv":
-            print("its a zprv")
-            
-        default:
-            print("its a recovery phrase?")
-            
-            Library.sharedInstance.words = string
-            
-            DispatchQueue.main.async {
-                
-                self.tabBarController?.selectedIndex = 0
-                
-            }
+            displayAlert(viewController: self, title: "Put your device into airplane mode and turn wifi off to import keys", message: "The idea of this app is to keep your keys from ever touching the internet.")
             
         }
         
